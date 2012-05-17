@@ -4,16 +4,16 @@ import javax.ws.rs.core.MediaType;
 
 import post.AppDetailsRequest;
 
-import com.github.cprice.phonegapbuild.api.data.AppFileExtensions;
-import com.github.cprice.phonegapbuild.api.data.ErrorResponse;
-import com.github.cprice.phonegapbuild.api.data.Platform;
-import com.github.cprice.phonegapbuild.api.data.ResourcePath.AppDownloadResourcePath;
-import com.github.cprice.phonegapbuild.api.data.ResourcePath.AppResourcePath;
-import com.github.cprice.phonegapbuild.api.data.ResourcePath.AppsResourcePath;
-import com.github.cprice.phonegapbuild.api.data.SuccessResponse;
-import com.github.cprice.phonegapbuild.api.data.apps.AppPlatformKeysResponse;
-import com.github.cprice.phonegapbuild.api.data.apps.AppResponse;
-import com.github.cprice.phonegapbuild.api.data.apps.AppsResponse;
+import com.github.chrisprice.phonegapbuild.api.data.AppFileExtensions;
+import com.github.chrisprice.phonegapbuild.api.data.ErrorResponse;
+import com.github.chrisprice.phonegapbuild.api.data.Platform;
+import com.github.chrisprice.phonegapbuild.api.data.SuccessResponse;
+import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppDownloadResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppsResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.apps.AppPlatformKeysResponse;
+import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
+import com.github.chrisprice.phonegapbuild.api.data.apps.AppsResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.multipart.FormDataBodyPart;

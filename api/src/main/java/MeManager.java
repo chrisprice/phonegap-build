@@ -1,5 +1,5 @@
-import com.github.cprice.phonegapbuild.api.data.ResourcePath.MeResourcePath;
-import com.github.cprice.phonegapbuild.api.data.me.MeResponse;
+import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.MeResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.sun.jersey.api.client.WebResource;
 
 

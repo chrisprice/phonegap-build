@@ -1,4 +1,4 @@
-import com.github.cprice.phonegapbuild.api.data.ErrorResponse;
+import com.github.chrisprice.phonegapbuild.api.data.ErrorResponse;
 
 @SuppressWarnings("serial")
 public class ApiException extends RuntimeException {

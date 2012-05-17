@@ -1,7 +1,7 @@
 import java.io.File;
 
-import com.github.cprice.phonegapbuild.api.data.Platform;
-import com.github.cprice.phonegapbuild.api.data.me.MeResponse;
+import com.github.chrisprice.phonegapbuild.api.data.Platform;
+import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache.ApacheHttpClient;

@@ -8,6 +8,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * Says "Hi" to the user.
  * 
  * @goal sayhi
+ * @phase package
  */
 public class BuildMojo extends AbstractMojo {
   public void execute() throws MojoExecutionException, MojoFailureException {

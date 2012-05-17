@@ -39,6 +39,12 @@ public class ResourcePath {
       super(path);
     }
   }
+  public static class AppDownloadResourcePath extends ResourcePath {
+
+    public AppDownloadResourcePath(String path) {
+      super(path);
+    }
+  }
 
   private final String path;
 

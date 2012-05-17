@@ -1,5 +1,6 @@
 import java.io.File;
 
+import com.github.cprice.phonegapbuild.api.data.Platform;
 import com.github.cprice.phonegapbuild.api.data.me.MeResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.json.JSONConfiguration;
@@ -26,7 +27,14 @@ public class Main {
     // appsManager.postNewApp(r, meResponse.getApps().getResourcePath(), appDetailsRequest, new File(
     // "c:\\crap\\index.html"));
 
-    appsManager.downloadAndroidApp(r, meResponse.getApps().getAll()[0].getResourcePath(), new File("c:\\crap"));
+    appsManager.downloadApp(r, meResponse.getApps().getAll()[0].getResourcePath(), Platform.ANDROID, new File(
+        "c:\\crap"));
+
+    appsManager.downloadApp(r, meResponse.getApps().getAll()[0].getResourcePath(), Platform.BLACKBERRY, new File(
+        "c:\\crap"));
+
+    appsManager.downloadApp(r, meResponse.getApps().getAll()[0].getResourcePath(), Platform.WINPHONE, new File(
+        "c:\\crap"));
   }
 
   private static WebResource createRootWebResource() {

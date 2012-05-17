@@ -13,7 +13,9 @@ public class AppResponse extends AbstractResource<AppResourcePath> {
   private String version;
   private AppStatusResponse status;
   private AppDownloadResponse download;
+  private AppKeysResponse keys;
   private String repo;
+
 
   public String getTitle() {
     return title;
@@ -66,6 +68,14 @@ public class AppResponse extends AbstractResource<AppResourcePath> {
   @Override
   protected AppResourcePath createResourcePath(String link) {
     return new AppResourcePath(link);
+  }
+
+  public AppKeysResponse getKeys() {
+    return keys;
+  }
+
+  public void setKeys(AppKeysResponse keys) {
+    this.keys = keys;
   }
 
 }

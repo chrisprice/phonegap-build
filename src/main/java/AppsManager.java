@@ -4,10 +4,14 @@ import javax.ws.rs.core.MediaType;
 
 import post.AppDetailsRequest;
 
+import com.github.cprice.phonegapbuild.api.data.AppFileExtensions;
 import com.github.cprice.phonegapbuild.api.data.ErrorResponse;
+import com.github.cprice.phonegapbuild.api.data.Platform;
+import com.github.cprice.phonegapbuild.api.data.ResourcePath.AppDownloadResourcePath;
 import com.github.cprice.phonegapbuild.api.data.ResourcePath.AppResourcePath;
 import com.github.cprice.phonegapbuild.api.data.ResourcePath.AppsResourcePath;
 import com.github.cprice.phonegapbuild.api.data.SuccessResponse;
+import com.github.cprice.phonegapbuild.api.data.apps.AppPlatformKeysResponse;
 import com.github.cprice.phonegapbuild.api.data.apps.AppResponse;
 import com.github.cprice.phonegapbuild.api.data.apps.AppsResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -60,17 +64,20 @@ public class AppsManager {
     }
   }
 
-  public File downloadAndroidApp(WebResource resource, AppResourcePath appResourcePath, File targetDirectory) {
+  public File downloadApp(WebResource resource, AppResourcePath appResourcePath, Platform platform,
+      File targetDirectory) {
     try {
-      AppResponse app = getApp(resource, appResourcePath);
-
-      while (app.getDownload().getAndroid() == null) {
+      AppResponse app = null;
+      AppDownloadResourcePath path = null;
+      while (path == null) {
         // do some waiting logic
         Thread.sleep(5000);
         app = getApp(resource, appResourcePath);
+        path = app.getDownload().get(platform);
       }
-      File file = resource.path(app.getDownload().getAndroid()).get(File.class);
-      if (!file.renameTo(new File(targetDirectory, app.getTitle() + ".apk"))) {
+      File file = resource.path(path.getPath()).get(File.class);
+      String extension = AppFileExtensions.get(platform, isSigned(platform, app));
+      if (!file.renameTo(new File(targetDirectory, app.getTitle() + "." + extension))) {
         throw new ApiException("Could not move/rename downloaded file. It may still be available at "
             + file.getAbsolutePath() + ".");
       }
@@ -80,6 +87,11 @@ public class AppsManager {
     } catch (InterruptedException e) {
       throw new ApiException("Interupted whilst waiting for download to become available", e);
     }
+  }
+
+  protected boolean isSigned(Platform platform, AppResponse app) {
+    AppPlatformKeysResponse platformKeysResponse = app.getKeys().get(platform);
+    return platformKeysResponse != null && platformKeysResponse.getAll().length > 0;
   }
 
 }

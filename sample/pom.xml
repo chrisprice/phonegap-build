@@ -19,6 +19,20 @@
 				<groupId>com.github.chrisprice</groupId>
 				<artifactId>phonegap-build-maven-plugin</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<id>phonegap-build</id>
+						<goals>
+							<goal>build</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<exclude>WEB-INF/**/*</exclude>
+								<exclude>WEB-INF</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

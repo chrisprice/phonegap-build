@@ -1,16 +1,20 @@
+package com.github.chrisprice.phonegapbuild.api.managers;
+
+
+
 import java.io.File;
 
 import javax.ws.rs.core.MediaType;
 
-import post.AppDetailsRequest;
-
+import com.github.chrisprice.phonegapbuild.api.ApiException;
 import com.github.chrisprice.phonegapbuild.api.data.AppFileExtensions;
 import com.github.chrisprice.phonegapbuild.api.data.ErrorResponse;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
-import com.github.chrisprice.phonegapbuild.api.data.SuccessResponse;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppDownloadResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppsResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.SuccessResponse;
+import com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppPlatformKeysResponse;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppsResponse;
@@ -75,13 +79,14 @@ public class AppsManager {
         app = getApp(resource, appResourcePath);
         path = app.getDownload().get(platform);
       }
-      File file = resource.path(path.getPath()).get(File.class);
+      File tempFile = resource.path(path.getPath()).get(File.class);
       String extension = AppFileExtensions.get(platform, isSigned(platform, app));
-      if (!file.renameTo(new File(targetDirectory, app.getTitle() + "." + extension))) {
+      File targetFile = new File(targetDirectory, app.getTitle() + "." + extension);
+      if (!tempFile.renameTo(targetFile)) {
         throw new ApiException("Could not move/rename downloaded file. It may still be available at "
-            + file.getAbsolutePath() + ".");
+            + tempFile.getAbsolutePath() + ".");
       }
-      return file;
+      return targetFile;
     } catch (UniformInterfaceException e) {
       throw new ApiException(e.getResponse().getEntity(ErrorResponse.class), e);
     } catch (InterruptedException e) {

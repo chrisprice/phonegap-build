@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <widget xmlns = "http://www.w3.org/ns/widgets"
+        xmlns:gap = "http://phonegap.com/ns/1.0"
+        id        = "com.github.chrisprice.phonegap-build-sample"
+        version   = "0.0.1">
+
+    <name>PhoneGap Build Sample</name>
+
+    <description>
+        A sample for phonegap-build-maven-plugin. 
+    </description>
+
+    <author href="http://github.com/chrisprice" email="price.c@gmail.com">
+        Chris Price
+    </author>
+
+</widget>

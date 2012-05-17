@@ -1,3 +1,4 @@
+package com.github.chrisprice.phonegapbuild.api;
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 

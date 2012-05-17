@@ -14,7 +14,7 @@ public class AppDownloadResponse implements HasAllPlatforms<AppDownloadResourceP
   private String winphone;
 
   public AppDownloadResourcePath getAndroid() {
-    return new AppDownloadResourcePath(android);
+    return android == null ? null : new AppDownloadResourcePath(android);
   }
 
   public void setAndroid(String android) {
@@ -22,7 +22,7 @@ public class AppDownloadResponse implements HasAllPlatforms<AppDownloadResourceP
   }
 
   public AppDownloadResourcePath getBlackberry() {
-    return new AppDownloadResourcePath(blackberry);
+    return blackberry == null ? null : new AppDownloadResourcePath(blackberry);
   }
 
   public void setBlackberry(String blackberry) {
@@ -30,7 +30,7 @@ public class AppDownloadResponse implements HasAllPlatforms<AppDownloadResourceP
   }
 
   public AppDownloadResourcePath getIos() {
-    return new AppDownloadResourcePath(ios);
+    return ios == null ? null : new AppDownloadResourcePath(ios);
   }
 
   public void setIos(String ios) {
@@ -38,7 +38,7 @@ public class AppDownloadResponse implements HasAllPlatforms<AppDownloadResourceP
   }
 
   public AppDownloadResourcePath getSymbian() {
-    return new AppDownloadResourcePath(symbian);
+    return symbian == null ? null : new AppDownloadResourcePath(symbian);
   }
 
   public void setSymbian(String symbian) {
@@ -46,7 +46,7 @@ public class AppDownloadResponse implements HasAllPlatforms<AppDownloadResourceP
   }
 
   public AppDownloadResourcePath getWebos() {
-    return new AppDownloadResourcePath(webos);
+    return webos == null ? null : new AppDownloadResourcePath(webos);
   }
 
   public void setWebos(String webos) {
@@ -54,7 +54,7 @@ public class AppDownloadResponse implements HasAllPlatforms<AppDownloadResourceP
   }
 
   public AppDownloadResourcePath getWinphone() {
-    return new AppDownloadResourcePath(winphone);
+    return winphone == null ? null : new AppDownloadResourcePath(winphone);
   }
 
   public void setWinphone(String winphone) {

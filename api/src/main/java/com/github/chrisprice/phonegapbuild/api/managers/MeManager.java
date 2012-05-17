@@ -1,3 +1,5 @@
+package com.github.chrisprice.phonegapbuild.api.managers;
+
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.MeResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.sun.jersey.api.client.WebResource;

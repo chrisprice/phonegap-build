@@ -1,7 +1,10 @@
+package com.github.chrisprice.phonegapbuild.api;
 import java.io.File;
 
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
+import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
+import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache.ApacheHttpClient;
@@ -37,7 +40,7 @@ public class Main {
         "c:\\crap"));
   }
 
-  private static WebResource createRootWebResource() {
+  public static WebResource createRootWebResource() {
     // create a DefaultApacheHttpClientConfig (instead of just a ClientConfig)
     DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
     // configure it to use the fiddler proxy

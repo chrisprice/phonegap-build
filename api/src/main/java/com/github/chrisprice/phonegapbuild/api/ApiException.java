@@ -1,3 +1,4 @@
+package com.github.chrisprice.phonegapbuild.api;
 import com.github.chrisprice.phonegapbuild.api.data.ErrorResponse;
 
 @SuppressWarnings("serial")

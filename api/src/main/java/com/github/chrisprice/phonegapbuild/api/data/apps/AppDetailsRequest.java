@@ -1,4 +1,4 @@
-package post;
+package com.github.chrisprice.phonegapbuild.api.data.apps;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 

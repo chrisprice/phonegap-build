@@ -41,7 +41,7 @@ public class Main {
     // create a DefaultApacheHttpClientConfig (instead of just a ClientConfig)
     DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
     // configure it to use the fiddler proxy
-    config.getProperties().put(DefaultApacheHttpClientConfig.PROPERTY_PROXY_URI, "http://127.0.0.1:8888");
+    // config.getProperties().put(DefaultApacheHttpClientConfig.PROPERTY_PROXY_URI, "http://127.0.0.1:8888");
     // configure it to parse JSON to POJOs
     config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
     // configure to follow re-directs (used for downloading packages)

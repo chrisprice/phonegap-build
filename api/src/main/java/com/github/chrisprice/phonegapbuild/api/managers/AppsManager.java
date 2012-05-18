@@ -1,7 +1,5 @@
 package com.github.chrisprice.phonegapbuild.api.managers;
 
-
-
 import java.io.File;
 
 import javax.ws.rs.core.MediaType;
@@ -47,12 +45,15 @@ public class AppsManager {
     return resource.path(appResourcePath.getPath()).get(AppResponse.class);
   }
 
-  public AppResponse putApp(WebResource resource, AppResourcePath appResourcePath, AppDetailsRequest appsRequest, File file) {
+  public AppResponse putApp(WebResource resource, AppResourcePath appResourcePath, AppDetailsRequest appsRequest,
+      File file) {
     try {
       FormDataMultiPart multiPart = new FormDataMultiPart();
 
       multiPart.bodyPart(new FileDataBodyPart("file", file));
-      multiPart.bodyPart(new FormDataBodyPart("data", appsRequest, MediaType.APPLICATION_JSON_TYPE));
+      if (appsRequest != null) {
+        multiPart.bodyPart(new FormDataBodyPart("data", appsRequest, MediaType.APPLICATION_JSON_TYPE));
+      }
       return resource.path(appResourcePath.getPath()).type(MediaType.MULTIPART_FORM_DATA_TYPE).put(AppResponse.class,
           multiPart);
     } catch (UniformInterfaceException e) {
@@ -68,8 +69,7 @@ public class AppsManager {
     }
   }
 
-  public File downloadApp(WebResource resource, AppResourcePath appResourcePath, Platform platform,
-      File targetDirectory) {
+  public File downloadApp(WebResource resource, AppResourcePath appResourcePath, Platform platform, File targetDirectory) {
     try {
       AppResponse app = null;
       AppDownloadResourcePath path = null;

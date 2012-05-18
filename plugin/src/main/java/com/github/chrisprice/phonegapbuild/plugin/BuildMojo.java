@@ -1,7 +1,9 @@
 package com.github.chrisprice.phonegapbuild.plugin;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -13,6 +15,7 @@ import com.github.chrisprice.phonegapbuild.api.Main;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
+import com.github.chrisprice.phonegapbuild.api.data.me.MeAppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
@@ -21,6 +24,9 @@ import com.sun.jersey.api.client.WebResource;
 /**
  * Compress the exploded package to a zip using the specified filters. Add in the config.xml from
  * src/main/phonegap-build/.
+ * 
+ * The compressed artifact will then be uploaded to either a pre-existing cloud app instance or a new one depending on
+ * whether a stored app id can be found.
  * 
  * @goal build
  * @phase package
@@ -57,8 +63,17 @@ public class BuildMojo extends AbstractMojo {
    * Working directory.
    * 
    * @parameter expression="${project.build.directory}/phonegap-build"
+   * @readonly
    */
   private File workingDirectory;
+
+  /**
+   * Application identifier file.
+   * 
+   * @parameter expression="${project.build.directory}/phonegap-build/app.id" r
+   * @readonly
+   */
+  private File appIdFile;
 
   /**
    * The application title. Can also be overridden in the config file.
@@ -90,61 +105,154 @@ public class BuildMojo extends AbstractMojo {
    */
   private String[] excludes = new String[] {"WEB-INF/**/*", "WEB-INF"};
 
-  public void setExcludes(String[] excludes) {
-    this.excludes = excludes;
+  private AppsManager appsManager = new AppsManager();
+
+  public void execute() throws MojoExecutionException, MojoFailureException {
+    // TODO: disable http client logging
+
+    getLog().debug("Creating zip for upload to cloud.");
+
+    final File appSource = createUploadPackage();
+
+    getLog().debug("Authenticating.");
+
+    WebResource webResource = Main.createRootWebResource();
+
+    getLog().debug("Requesting summary from cloud.");
+
+    MeResponse me = new MeManager().requestMe(webResource);
+
+    getLog().debug("Checking for existing app.");
+
+    MeAppResponse appSummary = getStoredAppSummary(me);
+
+    AppResponse appDetails = null;
+    if (appSummary != null) {
+
+      getLog().info("Starting upload to existing app id " + appSummary.getId());
+
+      appDetails = appsManager.putApp(webResource, appSummary.getResourcePath(), null, appSource);
+
+    } else {
+      getLog().debug("Building upload request.");
+
+      AppDetailsRequest appDetailsRequest = createNewAppUploadDetails();
+
+      getLog().info("Starting upload.");
+
+      appDetails = appsManager.postNewApp(webResource, me.getApps().getResourcePath(), appDetailsRequest, appSource);
+
+      getLog().info("Storing new app id " + appDetails.getId());
+
+      storeAppSummary(appDetails);
+    }
+
+    getLog().info("Starting downloads.");
+
+    downloadArtifacts(webResource, appDetails);
+  }
+
+  private void storeAppSummary(AppResponse appDetails) throws MojoExecutionException {
+    try {
+      FileUtils.writeStringToFile(appIdFile, Integer.toString(appDetails.getId()));
+    } catch (IOException e) {
+      throw new MojoExecutionException("Failed to store app id", e);
+    }
+  }
+
+  private void downloadArtifacts(WebResource webResource, AppResponse appDetails) {
+    File androidApp =
+        appsManager.downloadApp(webResource, appDetails.getResourcePath(), Platform.ANDROID, workingDirectory);
+
+    mavenProjectHelper.attachArtifact(project, "apk", "android", androidApp);
+  }
+
+  private AppDetailsRequest createNewAppUploadDetails() {
+    AppDetailsRequest appDetailsRequest = new AppDetailsRequest();
+    appDetailsRequest.setCreateMethod("file");
+    appDetailsRequest.setTitle(appTitle);
+    return appDetailsRequest;
+  }
+
+  private File createUploadPackage() throws MojoExecutionException {
+    workingDirectory.mkdirs();
+
+    File file = new File(workingDirectory, "file.zip");
+
+    try {
+      zipArchiver.addDirectory(warDirectory, includes, excludes);
+      zipArchiver.addFile(configFile, "config.xml");
+      zipArchiver.setDestFile(file);
+      zipArchiver.createArchive();
+    } catch (Exception e) {
+      throw new MojoExecutionException("Could not zip", e);
+    }
+    return file;
+  }
+
+  /**
+   * Check if the stored app id (if it exists) is a known app and return it.
+   */
+  MeAppResponse getStoredAppSummary(MeResponse meResponse) throws MojoExecutionException {
+    try {
+      if (!appIdFile.exists()) {
+        return null;
+      }
+      int appId = Integer.parseInt(FileUtils.readFileToString(appIdFile));
+      MeAppResponse[] all = meResponse.getApps().getAll();
+      for (MeAppResponse app : all) {
+        if (app.getId() == appId) {
+          return app;
+        }
+      }
+      return null;
+    } catch (IOException e) {
+      throw new MojoExecutionException("Failed to read stored app id", e);
+    }
+  }
+
+  public void setZipArchiver(ZipArchiver zipArchiver) {
+    this.zipArchiver = zipArchiver;
+  }
+
+  public void setMavenProjectHelper(MavenProjectHelper mavenProjectHelper) {
+    this.mavenProjectHelper = mavenProjectHelper;
+  }
+
+  public void setProject(MavenProject project) {
+    this.project = project;
+  }
+
+  public void setConfigFile(File configFile) {
+    this.configFile = configFile;
+  }
+
+  public void setWorkingDirectory(File workingDirectory) {
+    this.workingDirectory = workingDirectory;
+  }
+
+  public void setAppIdFile(File appIdFile) {
+    this.appIdFile = appIdFile;
+  }
+
+  public void setAppTitle(String appTitle) {
+    this.appTitle = appTitle;
+  }
+
+  public void setWarDirectory(File warDirectory) {
+    this.warDirectory = warDirectory;
   }
 
   public void setIncludes(String[] includes) {
     this.includes = includes;
   }
 
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  public void setExcludes(String[] excludes) {
+    this.excludes = excludes;
+  }
 
-    getLog().info("Creating zip for upload to cloud.");
-
-    workingDirectory.mkdirs();
-
-    final File appSource = new File(workingDirectory, "file.zip");
-
-    try {
-      zipArchiver.addDirectory(warDirectory, includes, excludes);
-      zipArchiver.addFile(configFile, "config.xml");
-      zipArchiver.setDestFile(appSource);
-      zipArchiver.createArchive();
-    } catch (Exception e) {
-      throw new MojoExecutionException("Could not zip", e);
-    }
-
-    // disable jersey logging
-    java.util.logging.Logger jersey = java.util.logging.Logger.getLogger("com.sun.jersey");
-    jersey.setLevel(java.util.logging.Level.OFF);
-
-    getLog().info("Building upload request.");
-
-    AppDetailsRequest appDetailsRequest = new AppDetailsRequest();
-    appDetailsRequest.setCreateMethod("file");
-    appDetailsRequest.setTitle(appTitle);
-
-    getLog().info("Authenticating.");
-
-    WebResource webResource = Main.createRootWebResource();
-
-    MeManager meManager = new MeManager();
-    MeResponse me = meManager.requestMe(webResource);
-
-    getLog().info("Starting upload.");
-
-    AppsManager appsManager = new AppsManager();
-
-    AppResponse newApp =
-        appsManager.postNewApp(webResource, me.getApps().getResourcePath(), appDetailsRequest, appSource);
-
-    getLog().info("Starting downloads.");
-
-    File androidApp =
-        appsManager.downloadApp(webResource, newApp.getResourcePath(), Platform.ANDROID, workingDirectory);
-
-    mavenProjectHelper.attachArtifact(project, "apk", "android", androidApp);
+  public void setAppsManager(AppsManager appsManager) {
+    this.appsManager = appsManager;
   }
 
 }

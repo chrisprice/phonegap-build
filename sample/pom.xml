@@ -23,14 +23,9 @@
 					<execution>
 						<id>phonegap-build</id>
 						<goals>
+							<goal>clean</goal>
 							<goal>build</goal>
 						</goals>
-						<configuration>
-							<excludes>
-								<exclude>WEB-INF/**/*</exclude>
-								<exclude>WEB-INF</exclude>
-							</excludes>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

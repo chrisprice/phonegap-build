@@ -76,6 +76,13 @@ public class BuildMojo extends AbstractMojo {
   private File appIdFile;
 
   /**
+   * iOS signing key identifier
+   * 
+   * @parameter
+   */
+  private Integer iOsKeyId;
+
+  /**
    * The application title. Can also be overridden in the config file.
    * 
    * @parameter expression="${project.build.finalName}"
@@ -134,6 +141,7 @@ public class BuildMojo extends AbstractMojo {
       appDetails = appsManager.putApp(webResource, appSummary.getResourcePath(), null, appSource);
 
     } else {
+
       getLog().debug("Building upload request.");
 
       AppDetailsRequest appDetailsRequest = createNewAppUploadDetails();
@@ -165,12 +173,24 @@ public class BuildMojo extends AbstractMojo {
         appsManager.downloadApp(webResource, appDetails.getResourcePath(), Platform.ANDROID, workingDirectory);
 
     mavenProjectHelper.attachArtifact(project, "apk", "android", androidApp);
+
+    // only attempt to download iOS if there was a valid signing key
+    if (appDetails.getKeys().getIos() != null) {
+      File iOsApp = appsManager.downloadApp(webResource, appDetails.getResourcePath(), Platform.IOS, workingDirectory);
+
+      mavenProjectHelper.attachArtifact(project, "ipa", "ios", iOsApp);
+    }
   }
 
   private AppDetailsRequest createNewAppUploadDetails() {
     AppDetailsRequest appDetailsRequest = new AppDetailsRequest();
     appDetailsRequest.setCreateMethod("file");
     appDetailsRequest.setTitle(appTitle);
+    if (iOsKeyId != null) {
+      AppDetailsRequest.Keys keys = new AppDetailsRequest.Keys();
+      keys.setIos(iOsKeyId);
+      appDetailsRequest.setKeys(keys);
+    }
     return appDetailsRequest;
   }
 

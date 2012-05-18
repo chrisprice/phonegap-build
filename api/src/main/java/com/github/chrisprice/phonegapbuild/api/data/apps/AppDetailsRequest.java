@@ -3,12 +3,26 @@ package com.github.chrisprice.phonegapbuild.api.data.apps;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class AppDetailsRequest {
+  public static class Keys {
+    private int ios;
+
+    public int getIos() {
+      return ios;
+    }
+
+    public void setIos(int ios) {
+      this.ios = ios;
+    }
+
+  }
+
   private String title;
   @JsonProperty("package")
   private String packageName;
   private String version;
   @JsonProperty("create_method")
   private String createMethod;
+  private Keys keys;
 
   public String getTitle() {
     return title;
@@ -40,6 +54,14 @@ public class AppDetailsRequest {
 
   public void setVersion(String version) {
     this.version = version;
+  }
+
+  public Keys getKeys() {
+    return keys;
+  }
+
+  public void setKeys(Keys keys) {
+    this.keys = keys;
   }
 
 }

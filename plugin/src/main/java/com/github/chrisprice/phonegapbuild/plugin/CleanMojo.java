@@ -24,14 +24,6 @@ import com.sun.jersey.api.client.WebResource;
 public class CleanMojo extends AbstractMojo {
 
   /**
-   * Working directory.
-   * 
-   * @parameter expression="${project.build.directory}/phonegap-build"
-   * @readonly
-   */
-  private File workingDirectory;
-
-  /**
    * Application identifier file.
    * 
    * @parameter expression="${project.build.directory}/phonegap-build/app.id" r
@@ -81,10 +73,6 @@ public class CleanMojo extends AbstractMojo {
     } catch (IOException e) {
       throw new MojoExecutionException("Failed to read stored app id", e);
     }
-  }
-
-  public void setWorkingDirectory(File workingDirectory) {
-    this.workingDirectory = workingDirectory;
   }
 
   public void setAppIdFile(File appIdFile) {

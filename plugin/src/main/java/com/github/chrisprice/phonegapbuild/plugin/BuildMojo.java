@@ -70,7 +70,7 @@ public class BuildMojo extends AbstractMojo {
   /**
    * Application identifier file.
    * 
-   * @parameter expression="${project.build.directory}/phonegap-build/app.id" r
+   * @parameter expression="${project.build.directory}/phonegap-build/app.id"
    * @readonly
    */
   private File appIdFile;

@@ -5,69 +5,69 @@ import com.github.chrisprice.phonegapbuild.api.data.HasAllPlatforms;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 
-public class AppKeysResponse extends AbstractResource<ResourcePath> implements HasAllPlatforms<AppPlatformKeysResponse> {
+public class AppKeysResponse extends AbstractResource<ResourcePath> implements HasAllPlatforms<AppPlatformKeyResponse> {
 
-  private AppPlatformKeysResponse android;
-  private AppPlatformKeysResponse blackberry;
-  private AppPlatformKeysResponse ios;
-  private AppPlatformKeysResponse symbian;
-  private AppPlatformKeysResponse webos;
-  private AppPlatformKeysResponse winphone;
+  private AppPlatformKeyResponse android;
+  private AppPlatformKeyResponse blackberry;
+  private AppPlatformKeyResponse ios;
+  private AppPlatformKeyResponse symbian;
+  private AppPlatformKeyResponse webos;
+  private AppPlatformKeyResponse winphone;
 
   @Override
   protected ResourcePath createResourcePath(String link) {
     return null;
   }
 
-  public AppPlatformKeysResponse getAndroid() {
+  public AppPlatformKeyResponse getAndroid() {
     return android;
   }
 
-  public void setAndroid(AppPlatformKeysResponse android) {
+  public void setAndroid(AppPlatformKeyResponse android) {
     this.android = android;
   }
 
-  public AppPlatformKeysResponse getBlackberry() {
+  public AppPlatformKeyResponse getBlackberry() {
     return blackberry;
   }
 
-  public void setBlackberry(AppPlatformKeysResponse blackberry) {
+  public void setBlackberry(AppPlatformKeyResponse blackberry) {
     this.blackberry = blackberry;
   }
 
-  public AppPlatformKeysResponse getIos() {
+  public AppPlatformKeyResponse getIos() {
     return ios;
   }
 
-  public void setIos(AppPlatformKeysResponse ios) {
+  public void setIos(AppPlatformKeyResponse ios) {
     this.ios = ios;
   }
 
-  public AppPlatformKeysResponse getSymbian() {
+  public AppPlatformKeyResponse getSymbian() {
     return symbian;
   }
 
-  public void setSymbian(AppPlatformKeysResponse symbian) {
+  public void setSymbian(AppPlatformKeyResponse symbian) {
     this.symbian = symbian;
   }
 
-  public AppPlatformKeysResponse getWebos() {
+  public AppPlatformKeyResponse getWebos() {
     return webos;
   }
 
-  public void setWebos(AppPlatformKeysResponse webos) {
+  public void setWebos(AppPlatformKeyResponse webos) {
     this.webos = webos;
   }
 
-  public AppPlatformKeysResponse getWinphone() {
+  public AppPlatformKeyResponse getWinphone() {
     return winphone;
   }
 
-  public void setWinphone(AppPlatformKeysResponse winphone) {
+  public void setWinphone(AppPlatformKeyResponse winphone) {
     this.winphone = winphone;
   }
 
-  public AppPlatformKeysResponse get(Platform platform) {
+  public AppPlatformKeyResponse get(Platform platform) {
     return platform.get(this);
   }
 }

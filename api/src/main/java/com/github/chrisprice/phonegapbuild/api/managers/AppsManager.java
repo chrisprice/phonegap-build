@@ -13,7 +13,6 @@ import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppResourcePath
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppsResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.SuccessResponse;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest;
-import com.github.chrisprice.phonegapbuild.api.data.apps.AppPlatformKeysResponse;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppsResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -95,8 +94,7 @@ public class AppsManager {
   }
 
   protected boolean isSigned(Platform platform, AppResponse app) {
-    AppPlatformKeysResponse platformKeysResponse = app.getKeys().get(platform);
-    return platformKeysResponse != null && platformKeysResponse.getAll().length > 0;
+    return app.getKeys().get(platform) != null;
   }
 
 }

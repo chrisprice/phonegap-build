@@ -81,9 +81,14 @@ public class AppsManager {
       File tempFile = resource.path(path.getPath()).get(File.class);
       String extension = AppFileExtensions.get(platform, isSigned(platform, app));
       File targetFile = new File(targetDirectory, app.getTitle() + "." + extension);
+      if (targetFile.exists()) {
+        if (!targetFile.delete()) {
+          throw new ApiException("Could not delete previously downloaded file " + targetFile.getAbsolutePath() + ".");
+        }
+      }
       if (!tempFile.renameTo(targetFile)) {
-        throw new ApiException("Could not move/rename downloaded file. It may still be available at "
-            + tempFile.getAbsolutePath() + ".");
+        throw new ApiException("Could not move/rename downloaded file to " + targetFile.getAbsolutePath()
+            + ". It may still be available at " + tempFile.getAbsolutePath() + ".");
       }
       return targetFile;
     } catch (UniformInterfaceException e) {

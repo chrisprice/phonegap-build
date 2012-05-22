@@ -11,7 +11,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
-import com.github.chrisprice.phonegapbuild.api.Main;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
@@ -55,6 +54,20 @@ public class BuildMojo extends AbstractMojo {
    * @readonly
    */
   private MavenProject project;
+
+  /**
+   * PhoneGap Build username
+   * 
+   * @parameter expression="${phonegap-build.username}"
+   */
+  private String username;
+
+  /**
+   * PhoneGap Build password
+   * 
+   * @parameter expression="${phonegap-build.password}"
+   */
+  private String password;
 
   /**
    * Configuration file.
@@ -151,7 +164,7 @@ public class BuildMojo extends AbstractMojo {
 
     getLog().debug("Authenticating.");
 
-    WebResource webResource = Main.createRootWebResource();
+    WebResource webResource = meManager.createRootWebResource(username, password);
 
     getLog().debug("Requesting summary from cloud.");
 

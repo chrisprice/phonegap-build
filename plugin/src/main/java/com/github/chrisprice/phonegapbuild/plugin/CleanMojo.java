@@ -8,7 +8,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import com.github.chrisprice.phonegapbuild.api.Main;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeAppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
@@ -24,6 +23,20 @@ import com.sun.jersey.api.client.WebResource;
  * @phase pre-clean
  */
 public class CleanMojo extends AbstractMojo {
+
+  /**
+   * PhoneGap Build username
+   * 
+   * @parameter expression="${phonegap-build.username}"
+   */
+  private String username;
+
+  /**
+   * PhoneGap Build password
+   * 
+   * @parameter expression="${phonegap-build.password}"
+   */
+  private String password;
 
   /**
    * Application identifier file.
@@ -50,7 +63,7 @@ public class CleanMojo extends AbstractMojo {
 
     getLog().debug("Authenticating.");
 
-    WebResource webResource = Main.createRootWebResource();
+    WebResource webResource = meManager.createRootWebResource(username, password);
 
     getLog().debug("Requesting summary from cloud.");
 

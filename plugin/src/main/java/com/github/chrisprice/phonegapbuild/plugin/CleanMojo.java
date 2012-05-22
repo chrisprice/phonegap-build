@@ -10,8 +10,10 @@ import org.apache.maven.plugin.MojoFailureException;
 
 import com.github.chrisprice.phonegapbuild.api.Main;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeAppResponse;
+import com.github.chrisprice.phonegapbuild.api.data.me.MeKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
+import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
 import com.sun.jersey.api.client.WebResource;
 
@@ -31,8 +33,17 @@ public class CleanMojo extends AbstractMojo {
    */
   private File appIdFile;
 
+  /**
+   * iOS signing key identifier
+   * 
+   * @parameter expression="${project.build.directory}/phonegap-build/ios-key.id"
+   * @readonly
+   */
+  private File iOsKeyIdFile;
+
   private AppsManager appsManager = new AppsManager();
   private MeManager meManager = new MeManager();
+  private KeysManager keysManager = new KeysManager();
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     // TODO: disable http client logging
@@ -52,6 +63,15 @@ public class CleanMojo extends AbstractMojo {
     if (appSummary != null) {
       getLog().info("Deleting cloud app id " + appSummary.getId());
       appsManager.deleteApp(webResource, appSummary.getResourcePath());
+    }
+
+    getLog().debug("Checking for existing iOS key.");
+
+    MeKeyResponse iOsKey = getStoredIOsKey(me);
+
+    if (iOsKey != null) {
+      getLog().info("Deleting cloud key id " + iOsKey.getId());
+      keysManager.deleteKey(webResource, iOsKey.getResourcePath());
     }
   }
 
@@ -73,6 +93,24 @@ public class CleanMojo extends AbstractMojo {
       return null;
     } catch (IOException e) {
       throw new MojoExecutionException("Failed to read stored app id", e);
+    }
+  }
+
+  private MeKeyResponse getStoredIOsKey(MeResponse meResponse) throws MojoExecutionException {
+    try {
+      if (!iOsKeyIdFile.exists()) {
+        return null;
+      }
+      int keyId = Integer.parseInt(FileUtils.readFileToString(iOsKeyIdFile));
+      MeKeyResponse[] all = meResponse.getKeys().getIos().getAll();
+      for (MeKeyResponse key : all) {
+        if (key.getId() == keyId) {
+          return key;
+        }
+      }
+      return null;
+    } catch (IOException e) {
+      throw new MojoExecutionException("Failed to read stored iOS key id", e);
     }
   }
 

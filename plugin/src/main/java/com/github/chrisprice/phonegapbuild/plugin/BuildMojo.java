@@ -15,9 +15,13 @@ import com.github.chrisprice.phonegapbuild.api.Main;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
+import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyRequest;
+import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeAppResponse;
+import com.github.chrisprice.phonegapbuild.api.data.me.MeKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
+import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
 import com.sun.jersey.api.client.WebResource;
 
@@ -76,11 +80,33 @@ public class BuildMojo extends AbstractMojo {
   private File appIdFile;
 
   /**
+   * iOS p12 certificate
+   * 
+   * @parameter expression="${basedir}/src/main/phonegap-build/ios.p12"
+   */
+  private File iOsCertificate;
+
+  /**
+   * iOS certificate password
+   * 
+   * @parameter expression="${phonegap-build.ios.certificate.password}"
+   */
+  private String iOsCertificatePassword;
+
+  /**
+   * iOS mobileprovision file
+   * 
+   * @parameter expression="${basedir}/src/main/phonegap-build/ios.mobileprovision"
+   */
+  private File iOsMobileProvision;
+
+  /**
    * iOS signing key identifier
    * 
-   * @parameter
+   * @parameter expression="${project.build.directory}/phonegap-build/ios-key.id"
+   * @readonly
    */
-  private Integer iOsKeyId;
+  private File iOsKeyIdFile;
 
   /**
    * The application title. Can also be overridden in the config file.
@@ -114,6 +140,7 @@ public class BuildMojo extends AbstractMojo {
 
   private AppsManager appsManager = new AppsManager();
   private MeManager meManager = new MeManager();
+  private KeysManager keysManager = new KeysManager();
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     // TODO: disable http client logging
@@ -143,9 +170,34 @@ public class BuildMojo extends AbstractMojo {
 
     } else {
 
+      getLog().debug("Checking for existing ios key.");
+
+      Integer iOsKeyId;
+      {
+        MeKeyResponse storedIOsKey = getStoredIOsKey(me);
+        iOsKeyId = storedIOsKey == null ? null : storedIOsKey.getId();
+      }
+      if (iOsKeyId == null) {
+        getLog().debug("Building iOS key upload request.");
+
+        IOsKeyRequest iOsKeyRequest = createIOsKeyUploadRequest();
+
+        getLog().debug("iOS key not found, uploading.");
+
+        IOsKeyResponse iOsKeyResponse =
+            keysManager.postNewKey(webResource, me.getKeys().getIos().getResourcePath(), iOsKeyRequest, iOsCertificate,
+                iOsMobileProvision);
+
+        getLog().info("Storing new iOS key id " + iOsKeyResponse.getId());
+
+        storeIOsKey(iOsKeyResponse);
+
+        iOsKeyId = iOsKeyResponse.getId();
+      }
+
       getLog().debug("Building upload request.");
 
-      AppDetailsRequest appDetailsRequest = createNewAppUploadDetails();
+      AppDetailsRequest appDetailsRequest = createNewAppUploadDetails(iOsKeyId);
 
       getLog().info("Starting upload.");
 
@@ -159,6 +211,39 @@ public class BuildMojo extends AbstractMojo {
     getLog().info("Starting downloads.");
 
     downloadArtifacts(webResource, appDetails);
+  }
+
+  private void storeIOsKey(IOsKeyResponse iOsKeyResponse) throws MojoExecutionException {
+    try {
+      FileUtils.writeStringToFile(iOsKeyIdFile, Integer.toString(iOsKeyResponse.getId()));
+    } catch (IOException e) {
+      throw new MojoExecutionException("Failed to store iOS key id", e);
+    }
+  }
+
+  private IOsKeyRequest createIOsKeyUploadRequest() {
+    IOsKeyRequest iOsKeyRequest = new IOsKeyRequest();
+    iOsKeyRequest.setTitle(appTitle);
+    iOsKeyRequest.setPassword(iOsCertificatePassword);
+    return iOsKeyRequest;
+  }
+
+  private MeKeyResponse getStoredIOsKey(MeResponse meResponse) throws MojoExecutionException {
+    try {
+      if (!iOsKeyIdFile.exists()) {
+        return null;
+      }
+      int keyId = Integer.parseInt(FileUtils.readFileToString(iOsKeyIdFile));
+      MeKeyResponse[] all = meResponse.getKeys().getIos().getAll();
+      for (MeKeyResponse key : all) {
+        if (key.getId() == keyId) {
+          return key;
+        }
+      }
+      return null;
+    } catch (IOException e) {
+      throw new MojoExecutionException("Failed to read stored iOS key id", e);
+    }
   }
 
   private void storeAppSummary(AppResponse appDetails) throws MojoExecutionException {
@@ -183,7 +268,7 @@ public class BuildMojo extends AbstractMojo {
     }
   }
 
-  private AppDetailsRequest createNewAppUploadDetails() {
+  private AppDetailsRequest createNewAppUploadDetails(Integer iOsKeyId) {
     AppDetailsRequest appDetailsRequest = new AppDetailsRequest();
     appDetailsRequest.setCreateMethod("file");
     appDetailsRequest.setTitle(appTitle);

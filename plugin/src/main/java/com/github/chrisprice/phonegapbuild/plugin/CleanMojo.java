@@ -32,6 +32,7 @@ public class CleanMojo extends AbstractMojo {
   private File appIdFile;
 
   private AppsManager appsManager = new AppsManager();
+  private MeManager meManager = new MeManager();
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     // TODO: disable http client logging
@@ -42,7 +43,7 @@ public class CleanMojo extends AbstractMojo {
 
     getLog().debug("Requesting summary from cloud.");
 
-    MeResponse me = new MeManager().requestMe(webResource);
+    MeResponse me = meManager.requestMe(webResource);
 
     getLog().debug("Checking for existing app.");
 

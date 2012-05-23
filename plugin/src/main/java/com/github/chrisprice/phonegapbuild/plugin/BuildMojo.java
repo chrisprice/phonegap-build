@@ -10,6 +10,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
+import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 
 import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
@@ -24,6 +25,7 @@ import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
+import com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys;
 import com.sun.jersey.api.client.WebResource;
 
 /**
@@ -35,6 +37,7 @@ import com.sun.jersey.api.client.WebResource;
  * 
  * @goal build
  * @phase package
+ * @requiresDependencyResolution compile
  */
 public class BuildMojo extends AbstractMojo {
 
@@ -44,6 +47,13 @@ public class BuildMojo extends AbstractMojo {
    * @component role="org.codehaus.plexus.archiver.Archiver" roleHint="zip"
    */
   private ZipArchiver zipArchiver;
+
+  /**
+   * The Zip un-archiver.
+   * 
+   * @component role="org.codehaus.plexus.archiver.UnArchiver" roleHint="zip"
+   */
+  private ZipUnArchiver zipUnArchiver;
 
   /**
    * @component
@@ -97,7 +107,7 @@ public class BuildMojo extends AbstractMojo {
   /**
    * iOS p12 certificate
    * 
-   * @parameter expression="${basedir}/src/main/phonegap-build/ios.p12"
+   * @parameter expression="${project.build.directory}/phonegap-build/ios.p12"
    */
   private File iOsCertificate;
 
@@ -111,7 +121,7 @@ public class BuildMojo extends AbstractMojo {
   /**
    * iOS mobileprovision file
    * 
-   * @parameter expression="${basedir}/src/main/phonegap-build/ios.mobileprovision"
+   * @parameter expression="${project.build.directory}/phonegap-build/ios.mobileprovision"
    */
   private File iOsMobileProvision;
 
@@ -122,6 +132,14 @@ public class BuildMojo extends AbstractMojo {
    * @readonly
    */
   private File iOsKeyIdFile;
+
+  /**
+   * A comma delimited string of artifact co-ordinates used to filter the dependencies list for key packages. The
+   * co-ordinates should be of the form groupId:artifactId.
+   * 
+   * @parameter
+   */
+  private String keys;
 
   /**
    * The application title. Can also be overridden in the config file.
@@ -186,6 +204,13 @@ public class BuildMojo extends AbstractMojo {
       getLog().debug("Checking for existing ios key.");
 
       HasResourceIdAndPath<Key> iOsKey = getStoredIOsKey(me);
+      if (iOsKey == null && keys != null) {
+        getLog().debug("Fetching keys dependencies");
+
+        FetchKeys fetchKeys = new FetchKeys(zipUnArchiver, project, workingDirectory, keys);
+        fetchKeys.execute();
+      }
+
       if (iOsKey == null) {
         getLog().debug("Building iOS key upload request.");
 
@@ -366,6 +391,46 @@ public class BuildMojo extends AbstractMojo {
 
   public void setAppsManager(AppsManager appsManager) {
     this.appsManager = appsManager;
+  }
+
+  public void setZipUnArchiver(ZipUnArchiver zipUnArchiver) {
+    this.zipUnArchiver = zipUnArchiver;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public void setiOsCertificate(File iOsCertificate) {
+    this.iOsCertificate = iOsCertificate;
+  }
+
+  public void setiOsCertificatePassword(String iOsCertificatePassword) {
+    this.iOsCertificatePassword = iOsCertificatePassword;
+  }
+
+  public void setiOsMobileProvision(File iOsMobileProvision) {
+    this.iOsMobileProvision = iOsMobileProvision;
+  }
+
+  public void setiOsKeyIdFile(File iOsKeyIdFile) {
+    this.iOsKeyIdFile = iOsKeyIdFile;
+  }
+
+  public void setKeys(String keys) {
+    this.keys = keys;
+  }
+
+  public void setMeManager(MeManager meManager) {
+    this.meManager = meManager;
+  }
+
+  public void setKeysManager(KeysManager keysManager) {
+    this.keysManager = keysManager;
   }
 
 }

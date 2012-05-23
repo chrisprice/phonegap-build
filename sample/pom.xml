@@ -8,10 +8,16 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<name>PhoneGap Build Sample</name>
-
+ 
 	<dependencies>
+		<dependency>
+			<groupId>com.scottlogic.mobile</groupId>
+			<artifactId>certificates</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>zip</type>
+		</dependency>
 	</dependencies>
-
+ 
 
 	<build>
 		<plugins>
@@ -26,6 +32,9 @@
 							<goal>clean</goal>
 							<goal>build</goal>
 						</goals>
+						<configuration>
+							<keys>com.scottlogic.mobile:certificates</keys>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

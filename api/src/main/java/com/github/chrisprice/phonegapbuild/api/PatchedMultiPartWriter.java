@@ -65,6 +65,7 @@ public class PatchedMultiPartWriter extends MultiPartWriter {
     this.providers = providers;
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public void writeTo(MultiPart entity, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
       MultivaluedMap<String, Object> headers, OutputStream stream) throws IOException, WebApplicationException {

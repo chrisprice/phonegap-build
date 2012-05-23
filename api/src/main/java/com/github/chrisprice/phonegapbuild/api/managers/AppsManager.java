@@ -8,13 +8,14 @@ import com.github.chrisprice.phonegapbuild.api.ApiException;
 import com.github.chrisprice.phonegapbuild.api.data.AppFileExtensions;
 import com.github.chrisprice.phonegapbuild.api.data.ErrorResponse;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
-import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppDownloadResourcePath;
-import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppResourcePath;
-import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppsResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.SuccessResponse;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppsResponse;
+import com.github.chrisprice.phonegapbuild.api.data.resources.App;
+import com.github.chrisprice.phonegapbuild.api.data.resources.AppDownload;
+import com.github.chrisprice.phonegapbuild.api.data.resources.Apps;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.multipart.FormDataBodyPart;
@@ -22,11 +23,12 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 
 public class AppsManager {
-  public AppsResponse getApps(WebResource resource, AppsResourcePath appsResponsePath) {
+  public AppsResponse getApps(WebResource resource, ResourcePath<Apps> appsResponsePath) {
     return resource.path(appsResponsePath.getPath()).get(AppsResponse.class);
   }
 
-  public AppResponse postNewApp(WebResource resource, AppsResourcePath appsResponsePath, AppDetailsRequest appsRequest,
+  public AppResponse postNewApp(WebResource resource, ResourcePath<Apps> appsResponsePath,
+      AppDetailsRequest appsRequest,
       File file) {
     try {
       FormDataMultiPart multiPart = new FormDataMultiPart();
@@ -40,11 +42,11 @@ public class AppsManager {
     }
   }
 
-  public AppResponse getApp(WebResource resource, AppResourcePath appResourcePath) {
+  public AppResponse getApp(WebResource resource, ResourcePath<App> appResourcePath) {
     return resource.path(appResourcePath.getPath()).get(AppResponse.class);
   }
 
-  public AppResponse putApp(WebResource resource, AppResourcePath appResourcePath, AppDetailsRequest appsRequest,
+  public AppResponse putApp(WebResource resource, ResourcePath<App> appResourcePath, AppDetailsRequest appsRequest,
       File file) {
     try {
       FormDataMultiPart multiPart = new FormDataMultiPart();
@@ -60,7 +62,7 @@ public class AppsManager {
     }
   }
 
-  public SuccessResponse deleteApp(WebResource resource, AppResourcePath appResourcePath) {
+  public SuccessResponse deleteApp(WebResource resource, ResourcePath<App> appResourcePath) {
     try {
       return resource.path(appResourcePath.getPath()).delete(SuccessResponse.class);
     } catch (UniformInterfaceException e) {
@@ -68,10 +70,11 @@ public class AppsManager {
     }
   }
 
-  public File downloadApp(WebResource resource, AppResourcePath appResourcePath, Platform platform, File targetDirectory) {
+  public File downloadApp(WebResource resource, ResourcePath<App> appResourcePath, Platform platform,
+      File targetDirectory) {
     try {
       AppResponse app = null;
-      AppDownloadResourcePath path = null;
+      ResourcePath<AppDownload> path = null;
       while (path == null) {
         // do some waiting logic
         Thread.sleep(5000);

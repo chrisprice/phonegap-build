@@ -2,9 +2,10 @@ package com.github.chrisprice.phonegapbuild.api.data.apps;
 
 import com.github.chrisprice.phonegapbuild.api.data.HasAllPlatforms;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
-import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppDownloadResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.resources.AppDownload;
 
-public class AppDownloadResponse implements HasAllPlatforms<AppDownloadResourcePath> {
+public class AppDownloadResponse implements HasAllPlatforms<ResourcePath<AppDownload>> {
 
   private String android;
   private String blackberry;
@@ -13,55 +14,55 @@ public class AppDownloadResponse implements HasAllPlatforms<AppDownloadResourceP
   private String webos;
   private String winphone;
 
-  public AppDownloadResourcePath getAndroid() {
-    return android == null ? null : new AppDownloadResourcePath(android);
+  public ResourcePath<AppDownload> getAndroid() {
+    return android == null ? null : new ResourcePath<AppDownload>(android);
   }
 
   public void setAndroid(String android) {
     this.android = android;
   }
 
-  public AppDownloadResourcePath getBlackberry() {
-    return blackberry == null ? null : new AppDownloadResourcePath(blackberry);
+  public ResourcePath<AppDownload> getBlackberry() {
+    return blackberry == null ? null : new ResourcePath<AppDownload>(blackberry);
   }
 
   public void setBlackberry(String blackberry) {
     this.blackberry = blackberry;
   }
 
-  public AppDownloadResourcePath getIos() {
-    return ios == null ? null : new AppDownloadResourcePath(ios);
+  public ResourcePath<AppDownload> getIos() {
+    return ios == null ? null : new ResourcePath<AppDownload>(ios);
   }
 
   public void setIos(String ios) {
     this.ios = ios;
   }
 
-  public AppDownloadResourcePath getSymbian() {
-    return symbian == null ? null : new AppDownloadResourcePath(symbian);
+  public ResourcePath<AppDownload> getSymbian() {
+    return symbian == null ? null : new ResourcePath<AppDownload>(symbian);
   }
 
   public void setSymbian(String symbian) {
     this.symbian = symbian;
   }
 
-  public AppDownloadResourcePath getWebos() {
-    return webos == null ? null : new AppDownloadResourcePath(webos);
+  public ResourcePath<AppDownload> getWebos() {
+    return webos == null ? null : new ResourcePath<AppDownload>(webos);
   }
 
   public void setWebos(String webos) {
     this.webos = webos;
   }
 
-  public AppDownloadResourcePath getWinphone() {
-    return winphone == null ? null : new AppDownloadResourcePath(winphone);
+  public ResourcePath<AppDownload> getWinphone() {
+    return winphone == null ? null : new ResourcePath<AppDownload>(winphone);
   }
 
   public void setWinphone(String winphone) {
     this.winphone = winphone;
   }
 
-  public AppDownloadResourcePath get(Platform platform) {
+  public ResourcePath<AppDownload> get(Platform platform) {
     return platform.get(this);
   }
 }

@@ -11,14 +11,16 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
+import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
+import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyRequest;
-import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeAppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
+import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
@@ -156,8 +158,6 @@ public class BuildMojo extends AbstractMojo {
   private KeysManager keysManager = new KeysManager();
 
   public void execute() throws MojoExecutionException, MojoFailureException {
-    // TODO: disable http client logging
-
     getLog().debug("Creating zip for upload to cloud.");
 
     final File appSource = createUploadPackage();
@@ -185,32 +185,26 @@ public class BuildMojo extends AbstractMojo {
 
       getLog().debug("Checking for existing ios key.");
 
-      Integer iOsKeyId;
-      {
-        MeKeyResponse storedIOsKey = getStoredIOsKey(me);
-        iOsKeyId = storedIOsKey == null ? null : storedIOsKey.getId();
-      }
-      if (iOsKeyId == null) {
+      HasResourceIdAndPath<Key> iOsKey = getStoredIOsKey(me);
+      if (iOsKey == null) {
         getLog().debug("Building iOS key upload request.");
 
         IOsKeyRequest iOsKeyRequest = createIOsKeyUploadRequest();
 
         getLog().debug("iOS key not found, uploading.");
 
-        IOsKeyResponse iOsKeyResponse =
+        iOsKey =
             keysManager.postNewKey(webResource, me.getKeys().getIos().getResourcePath(), iOsKeyRequest, iOsCertificate,
                 iOsMobileProvision);
 
-        getLog().info("Storing new iOS key id " + iOsKeyResponse.getId());
+        getLog().info("Storing new iOS key id " + iOsKey.getResourceId());
 
-        storeIOsKey(iOsKeyResponse);
-
-        iOsKeyId = iOsKeyResponse.getId();
+        storeIOsKey(iOsKey.getResourceId());
       }
 
       getLog().debug("Building upload request.");
 
-      AppDetailsRequest appDetailsRequest = createNewAppUploadDetails(iOsKeyId);
+      AppDetailsRequest appDetailsRequest = createNewAppUploadDetails(iOsKey.getResourceId());
 
       getLog().info("Starting upload.");
 
@@ -226,9 +220,9 @@ public class BuildMojo extends AbstractMojo {
     downloadArtifacts(webResource, appDetails);
   }
 
-  private void storeIOsKey(IOsKeyResponse iOsKeyResponse) throws MojoExecutionException {
+  private void storeIOsKey(ResourceId<Key> iOsKeyId) throws MojoExecutionException {
     try {
-      FileUtils.writeStringToFile(iOsKeyIdFile, Integer.toString(iOsKeyResponse.getId()));
+      FileUtils.writeStringToFile(iOsKeyIdFile, Integer.toString(iOsKeyId.getId()));
     } catch (IOException e) {
       throw new MojoExecutionException("Failed to store iOS key id", e);
     }
@@ -241,7 +235,7 @@ public class BuildMojo extends AbstractMojo {
     return iOsKeyRequest;
   }
 
-  private MeKeyResponse getStoredIOsKey(MeResponse meResponse) throws MojoExecutionException {
+  private HasResourceIdAndPath<Key> getStoredIOsKey(MeResponse meResponse) throws MojoExecutionException {
     try {
       if (!iOsKeyIdFile.exists()) {
         return null;
@@ -281,13 +275,13 @@ public class BuildMojo extends AbstractMojo {
     }
   }
 
-  private AppDetailsRequest createNewAppUploadDetails(Integer iOsKeyId) {
+  private AppDetailsRequest createNewAppUploadDetails(ResourceId<Key> iOsKeyId) {
     AppDetailsRequest appDetailsRequest = new AppDetailsRequest();
     appDetailsRequest.setCreateMethod("file");
     appDetailsRequest.setTitle(appTitle);
     if (iOsKeyId != null) {
       AppDetailsRequest.Keys keys = new AppDetailsRequest.Keys();
-      keys.setIos(iOsKeyId);
+      keys.setIos(iOsKeyId.getId());
       appDetailsRequest.setKeys(keys);
     }
     return appDetailsRequest;

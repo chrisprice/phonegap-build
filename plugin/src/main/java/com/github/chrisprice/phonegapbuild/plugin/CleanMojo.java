@@ -8,9 +8,11 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
+import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeAppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
+import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
@@ -59,8 +61,6 @@ public class CleanMojo extends AbstractMojo {
   private KeysManager keysManager = new KeysManager();
 
   public void execute() throws MojoExecutionException, MojoFailureException {
-    // TODO: disable http client logging
-
     getLog().debug("Authenticating.");
 
     WebResource webResource = meManager.createRootWebResource(username, password);
@@ -80,10 +80,10 @@ public class CleanMojo extends AbstractMojo {
 
     getLog().debug("Checking for existing iOS key.");
 
-    MeKeyResponse iOsKey = getStoredIOsKey(me);
+    HasResourceIdAndPath<Key> iOsKey = getStoredIOsKey(me);
 
     if (iOsKey != null) {
-      getLog().info("Deleting cloud key id " + iOsKey.getId());
+      getLog().info("Deleting cloud key id " + iOsKey.getResourceId());
       keysManager.deleteKey(webResource, iOsKey.getResourcePath());
     }
   }
@@ -109,7 +109,7 @@ public class CleanMojo extends AbstractMojo {
     }
   }
 
-  private MeKeyResponse getStoredIOsKey(MeResponse meResponse) throws MojoExecutionException {
+  private HasResourceIdAndPath<Key> getStoredIOsKey(MeResponse meResponse) throws MojoExecutionException {
     try {
       if (!iOsKeyIdFile.exists()) {
         return null;

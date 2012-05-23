@@ -3,15 +3,26 @@ package com.github.chrisprice.phonegapbuild.api.data.me;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import com.github.chrisprice.phonegapbuild.api.data.AbstractResource;
-import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.KeyResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
+import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
+import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 
-public class MeKeyResponse extends AbstractResource<KeyResourcePath> {
+public class MeKeyResponse implements HasResourceIdAndPath<Key> {
   private int id;
   @JsonProperty("default")
   private boolean defaultKey;
   private String title;
+  private String link;
 
+  @Override
+  public ResourcePath<Key> getResourcePath() {
+    return new ResourcePath<Key>(link);
+  }
+
+  public String getLink() {
+    return link;
+  }
   public int getId() {
     return id;
   }
@@ -37,8 +48,8 @@ public class MeKeyResponse extends AbstractResource<KeyResourcePath> {
   }
 
   @Override
-  protected KeyResourcePath createResourcePath(String link) {
-    return new KeyResourcePath(link);
+  public ResourceId<Key> getResourceId() {
+    return new ResourceId<Key>(id);
   }
 
 }

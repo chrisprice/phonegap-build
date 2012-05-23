@@ -1,11 +1,9 @@
 package com.github.chrisprice.phonegapbuild.api.data.apps;
 
-import com.github.chrisprice.phonegapbuild.api.data.AbstractResource;
 import com.github.chrisprice.phonegapbuild.api.data.HasAllPlatforms;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
-import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 
-public class AppKeysResponse extends AbstractResource<ResourcePath> implements HasAllPlatforms<AppPlatformKeyResponse> {
+public class AppKeysResponse implements HasAllPlatforms<AppPlatformKeyResponse> {
 
   private AppPlatformKeyResponse android;
   private AppPlatformKeyResponse blackberry;
@@ -13,11 +11,6 @@ public class AppKeysResponse extends AbstractResource<ResourcePath> implements H
   private AppPlatformKeyResponse symbian;
   private AppPlatformKeyResponse webos;
   private AppPlatformKeyResponse winphone;
-
-  @Override
-  protected ResourcePath createResourcePath(String link) {
-    return null;
-  }
 
   public AppPlatformKeyResponse getAndroid() {
     return android;

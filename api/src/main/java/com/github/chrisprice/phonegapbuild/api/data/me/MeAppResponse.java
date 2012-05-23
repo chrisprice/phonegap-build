@@ -1,12 +1,23 @@
 package com.github.chrisprice.phonegapbuild.api.data.me;
 
-import com.github.chrisprice.phonegapbuild.api.data.AbstractResource;
-import com.github.chrisprice.phonegapbuild.api.data.ResourcePath.AppResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.HasResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 
-public class MeAppResponse extends AbstractResource<AppResourcePath> {
+public class MeAppResponse implements HasResourcePath<App> {
   private int id;
   private String title;
   private String role;
+  private String link;
+
+  @Override
+  public ResourcePath<App> getResourcePath() {
+    return new ResourcePath<App>(link);
+  }
+
+  public String getLink() {
+    return link;
+  }
 
   public String getTitle() {
     return title;
@@ -30,11 +41,6 @@ public class MeAppResponse extends AbstractResource<AppResourcePath> {
 
   public void setId(int id) {
     this.id = id;
-  }
-
-  @Override
-  protected AppResourcePath createResourcePath(String link) {
-    return new AppResourcePath(link);
   }
 
 }

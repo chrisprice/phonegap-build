@@ -28,8 +28,7 @@ public class AppsManager {
   }
 
   public AppResponse postNewApp(WebResource resource, ResourcePath<Apps> appsResponsePath,
-      AppDetailsRequest appsRequest,
-      File file) {
+      AppDetailsRequest appsRequest, File file) {
     try {
       FormDataMultiPart multiPart = new FormDataMultiPart();
 
@@ -79,7 +78,25 @@ public class AppsManager {
         // do some waiting logic
         Thread.sleep(5000);
         app = getApp(resource, appResourcePath);
-        path = app.getDownload().get(platform);
+        switch (app.getStatus().get(platform)) {
+          case PENDING:
+            // still waiting, back round the loop we go
+            break;
+          case COMPLETE:
+            // get the download link
+            path = app.getDownload().get(platform);
+            if (path == null) {
+              throw new ApiException("The server responded with a build complete status but no download link.");
+            }
+            break;
+          case ERROR:
+            // TODO: show error
+            throw new ApiException("Build error : " + "(error)");
+          case NULL:
+            throw new ApiException("This platform requires a key and no key has been defined.");
+          default:
+            throw new ApiException("The server responded with an unknown status code.");
+        }
       }
       File tempFile = resource.path(path.getPath()).get(File.class);
       String extension = AppFileExtensions.get(platform, isSigned(platform, app));

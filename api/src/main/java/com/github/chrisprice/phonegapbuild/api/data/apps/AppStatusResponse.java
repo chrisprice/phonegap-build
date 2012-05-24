@@ -1,59 +1,68 @@
 package com.github.chrisprice.phonegapbuild.api.data.apps;
 
-public class AppStatusResponse {
-  private String android;
-  private String blackberry;
-  private String ios;
-  private String symbian;
-  private String webos;
-  private String winphone;
+import com.github.chrisprice.phonegapbuild.api.data.HasAllPlatforms;
+import com.github.chrisprice.phonegapbuild.api.data.Platform;
+import com.github.chrisprice.phonegapbuild.api.data.Status;
 
-  public String getAndroid() {
+public class AppStatusResponse implements HasAllPlatforms<Status> {
+  private Status android;
+  private Status blackberry;
+  private Status ios;
+  private Status symbian;
+  private Status webos;
+  private Status winphone;
+
+  public Status getAndroid() {
     return android;
   }
 
-  public void setAndroid(String android) {
+  public void setAndroid(Status android) {
     this.android = android;
   }
 
-  public String getBlackberry() {
+  public Status getBlackberry() {
     return blackberry;
   }
 
-  public void setBlackberry(String blackberry) {
+  public void setBlackberry(Status blackberry) {
     this.blackberry = blackberry;
   }
 
-  public String getIos() {
+  public Status getIos() {
     return ios;
   }
 
-  public void setIos(String ios) {
+  public void setIos(Status ios) {
     this.ios = ios;
   }
 
-  public String getSymbian() {
+  public Status getSymbian() {
     return symbian;
   }
 
-  public void setSymbian(String symbian) {
+  public void setSymbian(Status symbian) {
     this.symbian = symbian;
   }
 
-  public String getWebos() {
+  public Status getWebos() {
     return webos;
   }
 
-  public void setWebos(String webos) {
+  public void setWebos(Status webos) {
     this.webos = webos;
   }
 
-  public String getWinphone() {
+  public Status getWinphone() {
     return winphone;
   }
 
-  public void setWinphone(String winphone) {
+  public void setWinphone(Status winphone) {
     this.winphone = winphone;
+  }
+
+  @Override
+  public Status get(Platform platform) {
+    return platform.get(this);
   }
 
 }

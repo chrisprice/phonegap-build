@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -171,6 +172,15 @@ public class BuildMojo extends AbstractMojo {
    */
   private String[] excludes = new String[] {"WEB-INF/**/*", "WEB-INF"};
 
+  /**
+   * The platforms to build for.
+   * 
+   * Defaults to android, blackberry, ios, symbian, webos and winphone
+   * 
+   * @parameter
+   */
+  private String[] platforms = new String[] {"android", "blackberry", "ios", "symbian", "webos", "winphone"};
+
   private AppsManager appsManager = new AppsManager();
   private MeManager meManager = new MeManager();
   private KeysManager keysManager = new KeysManager();
@@ -286,17 +296,17 @@ public class BuildMojo extends AbstractMojo {
     }
   }
 
-  private void downloadArtifacts(WebResource webResource, AppResponse appDetails) {
-    File androidApp =
-        appsManager.downloadApp(webResource, appDetails.getResourcePath(), Platform.ANDROID, workingDirectory);
-
-    mavenProjectHelper.attachArtifact(project, "apk", "android", androidApp);
-
-    // only attempt to download iOS if there was a valid signing key
-    if (appDetails.getKeys().getIos() != null) {
-      File iOsApp = appsManager.downloadApp(webResource, appDetails.getResourcePath(), Platform.IOS, workingDirectory);
-
-      mavenProjectHelper.attachArtifact(project, "ipa", "ios", iOsApp);
+  private void downloadArtifacts(WebResource webResource, AppResponse appDetails) throws MojoFailureException {
+    for (String value : this.platforms) {
+      Platform platform = Platform.get(value);
+      if (platform == null) {
+        throw new MojoFailureException("Unknown platform specified " + value);
+      }
+      getLog().info("Downloading binary for " + platform.getValue());
+      // download the app
+      File app = appsManager.downloadApp(webResource, appDetails.getResourcePath(), platform, workingDirectory);
+      // attach it to the project with the appropriate classifier (platform) and type (extension)
+      mavenProjectHelper.attachArtifact(project, FilenameUtils.getExtension(app.getName()), platform.getValue(), app);
     }
   }
 

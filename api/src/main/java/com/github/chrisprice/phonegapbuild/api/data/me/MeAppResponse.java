@@ -1,10 +1,11 @@
 package com.github.chrisprice.phonegapbuild.api.data.me;
 
-import com.github.chrisprice.phonegapbuild.api.data.HasResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
+import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 
-public class MeAppResponse implements HasResourcePath<App> {
+public class MeAppResponse implements HasResourceIdAndPath<App> {
   private int id;
   private String title;
   private String role;
@@ -41,6 +42,11 @@ public class MeAppResponse implements HasResourcePath<App> {
 
   public void setId(int id) {
     this.id = id;
+  }
+
+  @Override
+  public ResourceId<App> getResourceId() {
+    return new ResourceId<App>(id);
   }
 
 }

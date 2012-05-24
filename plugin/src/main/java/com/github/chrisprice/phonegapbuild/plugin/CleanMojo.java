@@ -1,21 +1,20 @@
 package com.github.chrisprice.phonegapbuild.plugin;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
-import com.github.chrisprice.phonegapbuild.api.data.me.MeAppResponse;
-import com.github.chrisprice.phonegapbuild.api.data.me.MeKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
+import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
+import com.github.chrisprice.phonegapbuild.plugin.utils.FileResourceIdStore;
+import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
 
 /**
@@ -41,24 +40,18 @@ public class CleanMojo extends AbstractMojo {
   private String password;
 
   /**
-   * Application identifier file.
+   * Working directory.
    * 
-   * @parameter expression="${project.build.directory}/phonegap-build/app.id" r
+   * @parameter expression="${project.build.directory}/phonegap-build"
    * @readonly
    */
-  private File appIdFile;
-
-  /**
-   * iOS signing key identifier
-   * 
-   * @parameter expression="${project.build.directory}/phonegap-build/ios-key.id"
-   * @readonly
-   */
-  private File iOsKeyIdFile;
+  private File workingDirectory;
 
   private AppsManager appsManager = new AppsManager();
   private MeManager meManager = new MeManager();
   private KeysManager keysManager = new KeysManager();
+  private ResourceIdStore<App> appIdStore = new FileResourceIdStore<App>();
+  private ResourceIdStore<Key> keyIdStore = new FileResourceIdStore<Key>();
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     getLog().debug("Authenticating.");
@@ -71,16 +64,20 @@ public class CleanMojo extends AbstractMojo {
 
     getLog().debug("Checking for existing app.");
 
-    MeAppResponse appSummary = getStoredAppSummary(me);
+    appIdStore.setAlias("app");
+    appIdStore.setWorkingDirectory(workingDirectory);
+    HasResourceIdAndPath<App> appSummary = appIdStore.load(me.getApps().getAll());
 
     if (appSummary != null) {
-      getLog().info("Deleting cloud app id " + appSummary.getId());
+      getLog().info("Deleting cloud app id " + appSummary.getResourceId());
       appsManager.deleteApp(webResource, appSummary.getResourcePath());
     }
 
     getLog().debug("Checking for existing iOS key.");
 
-    HasResourceIdAndPath<Key> iOsKey = getStoredIOsKey(me);
+    keyIdStore.setAlias("ios-key");
+    keyIdStore.setWorkingDirectory(workingDirectory);
+    HasResourceIdAndPath<Key> iOsKey = keyIdStore.load(me.getKeys().getIos().getAll());
 
     if (iOsKey != null) {
       getLog().info("Deleting cloud key id " + iOsKey.getResourceId());
@@ -88,51 +85,36 @@ public class CleanMojo extends AbstractMojo {
     }
   }
 
-  /**
-   * Check if the stored app id (if it exists) is a known app and return it.
-   */
-  MeAppResponse getStoredAppSummary(MeResponse meResponse) throws MojoExecutionException {
-    try {
-      if (!appIdFile.exists()) {
-        return null;
-      }
-      int appId = Integer.parseInt(FileUtils.readFileToString(appIdFile));
-      MeAppResponse[] all = meResponse.getApps().getAll();
-      for (MeAppResponse app : all) {
-        if (app.getId() == appId) {
-          return app;
-        }
-      }
-      return null;
-    } catch (IOException e) {
-      throw new MojoExecutionException("Failed to read stored app id", e);
-    }
+  public void setUsername(String username) {
+    this.username = username;
   }
 
-  private HasResourceIdAndPath<Key> getStoredIOsKey(MeResponse meResponse) throws MojoExecutionException {
-    try {
-      if (!iOsKeyIdFile.exists()) {
-        return null;
-      }
-      int keyId = Integer.parseInt(FileUtils.readFileToString(iOsKeyIdFile));
-      MeKeyResponse[] all = meResponse.getKeys().getIos().getAll();
-      for (MeKeyResponse key : all) {
-        if (key.getId() == keyId) {
-          return key;
-        }
-      }
-      return null;
-    } catch (IOException e) {
-      throw new MojoExecutionException("Failed to read stored iOS key id", e);
-    }
+  public void setPassword(String password) {
+    this.password = password;
   }
 
-  public void setAppIdFile(File appIdFile) {
-    this.appIdFile = appIdFile;
+  public void setWorkingDirectory(File workingDirectory) {
+    this.workingDirectory = workingDirectory;
   }
 
   public void setAppsManager(AppsManager appsManager) {
     this.appsManager = appsManager;
+  }
+
+  public void setMeManager(MeManager meManager) {
+    this.meManager = meManager;
+  }
+
+  public void setKeysManager(KeysManager keysManager) {
+    this.keysManager = keysManager;
+  }
+
+  public void setAppIdStore(ResourceIdStore<App> appIdStore) {
+    this.appIdStore = appIdStore;
+  }
+
+  public void setKeyIdStore(ResourceIdStore<Key> keyIdStore) {
+    this.keyIdStore = keyIdStore;
   }
 
 }

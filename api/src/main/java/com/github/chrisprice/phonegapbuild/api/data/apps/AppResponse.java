@@ -3,12 +3,13 @@ package com.github.chrisprice.phonegapbuild.api.data.apps;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
-import com.github.chrisprice.phonegapbuild.api.data.HasResourcePath;
+import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
+import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AppResponse implements HasResourcePath<App> {
+public class AppResponse implements HasResourceIdAndPath<App> {
   private String title;
   private int id;
   private String version;
@@ -81,6 +82,11 @@ public class AppResponse implements HasResourcePath<App> {
 
   public void setKeys(AppKeysResponse keys) {
     this.keys = keys;
+  }
+
+  @Override
+  public ResourceId<App> getResourceId() {
+    return new ResourceId<App>(id);
   }
 
 }

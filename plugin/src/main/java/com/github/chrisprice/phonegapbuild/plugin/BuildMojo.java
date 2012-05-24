@@ -1,9 +1,7 @@
 package com.github.chrisprice.phonegapbuild.plugin;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -19,14 +17,15 @@ import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyRequest;
-import com.github.chrisprice.phonegapbuild.api.data.me.MeAppResponse;
-import com.github.chrisprice.phonegapbuild.api.data.me.MeKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
+import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
 import com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys;
+import com.github.chrisprice.phonegapbuild.plugin.utils.FileResourceIdStore;
+import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
 
 /**
@@ -98,14 +97,6 @@ public class BuildMojo extends AbstractMojo {
   private File workingDirectory;
 
   /**
-   * Application identifier file.
-   * 
-   * @parameter expression="${project.build.directory}/phonegap-build/app.id"
-   * @readonly
-   */
-  private File appIdFile;
-
-  /**
    * iOS p12 certificate
    * 
    * @parameter expression="${project.build.directory}/phonegap-build/ios.p12"
@@ -125,14 +116,6 @@ public class BuildMojo extends AbstractMojo {
    * @parameter expression="${project.build.directory}/phonegap-build/ios.mobileprovision"
    */
   private File iOsMobileProvision;
-
-  /**
-   * iOS signing key identifier
-   * 
-   * @parameter expression="${project.build.directory}/phonegap-build/ios-key.id"
-   * @readonly
-   */
-  private File iOsKeyIdFile;
 
   /**
    * A comma delimited string of artifact co-ordinates used to filter the dependencies list for key packages. The
@@ -184,6 +167,9 @@ public class BuildMojo extends AbstractMojo {
   private AppsManager appsManager = new AppsManager();
   private MeManager meManager = new MeManager();
   private KeysManager keysManager = new KeysManager();
+  private FetchKeys fetchKeys = new FetchKeys();
+  private ResourceIdStore<App> appIdStore = new FileResourceIdStore<App>();
+  private ResourceIdStore<Key> keyIdStore = new FileResourceIdStore<Key>();
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     getLog().debug("Creating zip for upload to cloud.");
@@ -200,12 +186,14 @@ public class BuildMojo extends AbstractMojo {
 
     getLog().debug("Checking for existing app.");
 
-    MeAppResponse appSummary = getStoredAppSummary(me);
+    appIdStore.setAlias("app");
+    appIdStore.setWorkingDirectory(workingDirectory);
+    HasResourceIdAndPath<App> appSummary = appIdStore.load(me.getApps().getAll());
 
     AppResponse appDetails = null;
     if (appSummary != null) {
 
-      getLog().info("Starting upload to existing app id " + appSummary.getId());
+      getLog().info("Starting upload to existing app id " + appSummary.getResourceId());
 
       appDetails = appsManager.putApp(webResource, appSummary.getResourcePath(), null, appSource);
 
@@ -213,11 +201,13 @@ public class BuildMojo extends AbstractMojo {
 
       getLog().debug("Checking for existing ios key.");
 
-      HasResourceIdAndPath<Key> iOsKey = getStoredIOsKey(me);
+      keyIdStore.setAlias("ios-key");
+      keyIdStore.setWorkingDirectory(workingDirectory);
+
+      HasResourceIdAndPath<Key> iOsKey = keyIdStore.load(me.getKeys().getIos().getAll());
       if (iOsKey == null && keys != null) {
         getLog().debug("Fetching keys dependencies");
 
-        FetchKeys fetchKeys = new FetchKeys();
         fetchKeys.setIncludes(keys);
         fetchKeys.setProject(project);
         fetchKeys.setTargetDirectory(workingDirectory);
@@ -238,7 +228,7 @@ public class BuildMojo extends AbstractMojo {
 
         getLog().info("Storing new iOS key id " + iOsKey.getResourceId());
 
-        storeIOsKey(iOsKey.getResourceId());
+        keyIdStore.save(iOsKey.getResourceId());
       }
 
       getLog().debug("Building upload request.");
@@ -249,9 +239,9 @@ public class BuildMojo extends AbstractMojo {
 
       appDetails = appsManager.postNewApp(webResource, me.getApps().getResourcePath(), appDetailsRequest, appSource);
 
-      getLog().info("Storing new app id " + appDetails.getId());
+      getLog().info("Storing new app id " + appDetails.getResourceId());
 
-      storeAppSummary(appDetails);
+      appIdStore.save(appDetails.getResourceId());
     }
 
     getLog().info("Starting downloads.");
@@ -259,45 +249,11 @@ public class BuildMojo extends AbstractMojo {
     downloadArtifacts(webResource, appDetails);
   }
 
-  private void storeIOsKey(ResourceId<Key> iOsKeyId) throws MojoExecutionException {
-    try {
-      FileUtils.writeStringToFile(iOsKeyIdFile, Integer.toString(iOsKeyId.getId()));
-    } catch (IOException e) {
-      throw new MojoExecutionException("Failed to store iOS key id", e);
-    }
-  }
-
   private IOsKeyRequest createIOsKeyUploadRequest() {
     IOsKeyRequest iOsKeyRequest = new IOsKeyRequest();
     iOsKeyRequest.setTitle(appTitle);
     iOsKeyRequest.setPassword(iOsCertificatePassword);
     return iOsKeyRequest;
-  }
-
-  private HasResourceIdAndPath<Key> getStoredIOsKey(MeResponse meResponse) throws MojoExecutionException {
-    try {
-      if (!iOsKeyIdFile.exists()) {
-        return null;
-      }
-      int keyId = Integer.parseInt(FileUtils.readFileToString(iOsKeyIdFile));
-      MeKeyResponse[] all = meResponse.getKeys().getIos().getAll();
-      for (MeKeyResponse key : all) {
-        if (key.getId() == keyId) {
-          return key;
-        }
-      }
-      return null;
-    } catch (IOException e) {
-      throw new MojoExecutionException("Failed to read stored iOS key id", e);
-    }
-  }
-
-  private void storeAppSummary(AppResponse appDetails) throws MojoExecutionException {
-    try {
-      FileUtils.writeStringToFile(appIdFile, Integer.toString(appDetails.getId()));
-    } catch (IOException e) {
-      throw new MojoExecutionException("Failed to store app id", e);
-    }
   }
 
   private void downloadArtifacts(WebResource webResource, AppResponse appDetails) throws MojoFailureException {
@@ -342,27 +298,6 @@ public class BuildMojo extends AbstractMojo {
     return file;
   }
 
-  /**
-   * Check if the stored app id (if it exists) is a known app and return it.
-   */
-  MeAppResponse getStoredAppSummary(MeResponse meResponse) throws MojoExecutionException {
-    try {
-      if (!appIdFile.exists()) {
-        return null;
-      }
-      int appId = Integer.parseInt(FileUtils.readFileToString(appIdFile));
-      MeAppResponse[] all = meResponse.getApps().getAll();
-      for (MeAppResponse app : all) {
-        if (app.getId() == appId) {
-          return app;
-        }
-      }
-      return null;
-    } catch (IOException e) {
-      throw new MojoExecutionException("Failed to read stored app id", e);
-    }
-  }
-
   public void setZipArchiver(ZipArchiver zipArchiver) {
     this.zipArchiver = zipArchiver;
   }
@@ -381,10 +316,6 @@ public class BuildMojo extends AbstractMojo {
 
   public void setWorkingDirectory(File workingDirectory) {
     this.workingDirectory = workingDirectory;
-  }
-
-  public void setAppIdFile(File appIdFile) {
-    this.appIdFile = appIdFile;
   }
 
   public void setAppTitle(String appTitle) {
@@ -431,10 +362,6 @@ public class BuildMojo extends AbstractMojo {
     this.iOsMobileProvision = iOsMobileProvision;
   }
 
-  public void setiOsKeyIdFile(File iOsKeyIdFile) {
-    this.iOsKeyIdFile = iOsKeyIdFile;
-  }
-
   public void setKeys(String keys) {
     this.keys = keys;
   }
@@ -445,6 +372,22 @@ public class BuildMojo extends AbstractMojo {
 
   public void setKeysManager(KeysManager keysManager) {
     this.keysManager = keysManager;
+  }
+
+  public void setPlatforms(String[] platforms) {
+    this.platforms = platforms;
+  }
+
+  public void setFetchKeys(FetchKeys fetchKeys) {
+    this.fetchKeys = fetchKeys;
+  }
+
+  public void setAppIdStore(ResourceIdStore<App> appIdStore) {
+    this.appIdStore = appIdStore;
+  }
+
+  public void setKeyIdStore(ResourceIdStore<Key> keyIdStore) {
+    this.keyIdStore = keyIdStore;
   }
 
 }

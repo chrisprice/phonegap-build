@@ -217,7 +217,11 @@ public class BuildMojo extends AbstractMojo {
       if (iOsKey == null && keys != null) {
         getLog().debug("Fetching keys dependencies");
 
-        FetchKeys fetchKeys = new FetchKeys(zipUnArchiver, project, workingDirectory, keys);
+        FetchKeys fetchKeys = new FetchKeys();
+        fetchKeys.setIncludes(keys);
+        fetchKeys.setProject(project);
+        fetchKeys.setTargetDirectory(workingDirectory);
+        fetchKeys.setZipUnArchiver(zipUnArchiver);
         fetchKeys.execute();
       }
 

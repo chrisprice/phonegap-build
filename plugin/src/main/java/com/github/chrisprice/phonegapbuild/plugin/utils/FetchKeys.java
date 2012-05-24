@@ -24,12 +24,6 @@ public class FetchKeys {
    */
   private String includes;
 
-  public FetchKeys(ZipUnArchiver zipUnArchiver, MavenProject project, File workingDirectory, String includes) {
-    this.zipUnArchiver = zipUnArchiver;
-    this.project = project;
-    this.targetDirectory = workingDirectory;
-    this.includes = includes;
-  }
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     targetDirectory.mkdirs();
@@ -56,6 +50,22 @@ public class FetchKeys {
     } catch (ArchiverException e) {
       throw new MojoExecutionException("Failed to unzip the certificate archive", e);
     }
+  }
+
+  public void setZipUnArchiver(ZipUnArchiver zipUnArchiver) {
+    this.zipUnArchiver = zipUnArchiver;
+  }
+
+  public void setProject(MavenProject project) {
+    this.project = project;
+  }
+
+  public void setTargetDirectory(File targetDirectory) {
+    this.targetDirectory = targetDirectory;
+  }
+
+  public void setIncludes(String includes) {
+    this.includes = includes;
   }
 
 }

@@ -19,7 +19,11 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 
 // TODO: properly support keys for all platforms, this is currently a bit of a hack to make iOS work
-public class KeysManager {
+public class KeysManagerImpl implements KeysManager {
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.KeysManager#deleteKey(com.sun.jersey.api.client.WebResource, com.github.chrisprice.phonegapbuild.api.data.ResourcePath)
+   */
+  @Override
   public SuccessResponse deleteKey(WebResource resource, ResourcePath<Key> keyResourcePath) {
     try {
       return resource.path(keyResourcePath.getPath()).delete(SuccessResponse.class);
@@ -28,10 +32,18 @@ public class KeysManager {
     }
   }
 
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.KeysManager#getKey(com.sun.jersey.api.client.WebResource, com.github.chrisprice.phonegapbuild.api.data.ResourcePath)
+   */
+  @Override
   public IOsKeyResponse getKey(WebResource resource, ResourcePath<Key> keyResourcePath) {
     return resource.path(keyResourcePath.getPath()).get(IOsKeyResponse.class);
   }
 
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.KeysManager#postNewKey(com.sun.jersey.api.client.WebResource, com.github.chrisprice.phonegapbuild.api.data.ResourcePath, com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyRequest, java.io.File, java.io.File)
+   */
+  @Override
   public IOsKeyResponse postNewKey(WebResource resource, ResourcePath<PlatformKeys> platformResourcePath,
       IOsKeyRequest iOsKeyRequest, File cert, File profile) {
     try {

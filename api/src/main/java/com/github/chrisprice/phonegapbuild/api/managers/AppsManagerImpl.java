@@ -22,11 +22,19 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 
-public class AppsManager {
+public class AppsManagerImpl implements AppsManager {
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.AppsManager#getApps(com.sun.jersey.api.client.WebResource, com.github.chrisprice.phonegapbuild.api.data.ResourcePath)
+   */
+  @Override
   public AppsResponse getApps(WebResource resource, ResourcePath<Apps> appsResponsePath) {
     return resource.path(appsResponsePath.getPath()).get(AppsResponse.class);
   }
 
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.AppsManager#postNewApp(com.sun.jersey.api.client.WebResource, com.github.chrisprice.phonegapbuild.api.data.ResourcePath, com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest, java.io.File)
+   */
+  @Override
   public AppResponse postNewApp(WebResource resource, ResourcePath<Apps> appsResponsePath,
       AppDetailsRequest appsRequest, File file) {
     try {
@@ -41,10 +49,18 @@ public class AppsManager {
     }
   }
 
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.AppsManager#getApp(com.sun.jersey.api.client.WebResource, com.github.chrisprice.phonegapbuild.api.data.ResourcePath)
+   */
+  @Override
   public AppResponse getApp(WebResource resource, ResourcePath<App> appResourcePath) {
     return resource.path(appResourcePath.getPath()).get(AppResponse.class);
   }
 
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.AppsManager#putApp(com.sun.jersey.api.client.WebResource, com.github.chrisprice.phonegapbuild.api.data.ResourcePath, com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest, java.io.File)
+   */
+  @Override
   public AppResponse putApp(WebResource resource, ResourcePath<App> appResourcePath, AppDetailsRequest appsRequest,
       File file) {
     try {
@@ -61,6 +77,10 @@ public class AppsManager {
     }
   }
 
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.AppsManager#deleteApp(com.sun.jersey.api.client.WebResource, com.github.chrisprice.phonegapbuild.api.data.ResourcePath)
+   */
+  @Override
   public SuccessResponse deleteApp(WebResource resource, ResourcePath<App> appResourcePath) {
     try {
       return resource.path(appResourcePath.getPath()).delete(SuccessResponse.class);
@@ -69,6 +89,10 @@ public class AppsManager {
     }
   }
 
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.AppsManager#downloadApp(com.sun.jersey.api.client.WebResource, com.github.chrisprice.phonegapbuild.api.data.ResourcePath, com.github.chrisprice.phonegapbuild.api.data.Platform, java.io.File)
+   */
+  @Override
   public File downloadApp(WebResource resource, ResourcePath<App> appResourcePath, Platform platform,
       File targetDirectory) {
     try {

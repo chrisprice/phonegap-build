@@ -57,6 +57,19 @@ public enum Platform {
     return LOOKUP.get(value);
   }
 
+  public static Platform[] get(String... values) {
+    Platform[] platforms = new Platform[values.length];
+    for (int i = 0; i < values.length; i++) {
+      String value = values[i];
+      Platform platform = Platform.get(value);
+      if (platform == null) {
+        throw new RuntimeException("Unknown platform specified " + value);
+      }
+      platforms[i] = platform;
+    }
+    return platforms;
+  }
+
   public String getValue() {
     return value;
   }

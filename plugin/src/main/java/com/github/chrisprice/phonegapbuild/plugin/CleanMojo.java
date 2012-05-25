@@ -11,8 +11,11 @@ import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
+import com.github.chrisprice.phonegapbuild.api.managers.AppsManagerImpl;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
+import com.github.chrisprice.phonegapbuild.api.managers.KeysManagerImpl;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
+import com.github.chrisprice.phonegapbuild.api.managers.MeManagerImpl;
 import com.github.chrisprice.phonegapbuild.plugin.utils.FileResourceIdStore;
 import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
@@ -47,9 +50,9 @@ public class CleanMojo extends AbstractMojo {
    */
   private File workingDirectory;
 
-  private AppsManager appsManager = new AppsManager();
-  private MeManager meManager = new MeManager();
-  private KeysManager keysManager = new KeysManager();
+  private AppsManager appsManager = new AppsManagerImpl();
+  private MeManager meManager = new MeManagerImpl();
+  private KeysManager keysManager = new KeysManagerImpl();
   private ResourceIdStore<App> appIdStore = new FileResourceIdStore<App>();
   private ResourceIdStore<Key> keyIdStore = new FileResourceIdStore<Key>();
 

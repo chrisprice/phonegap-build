@@ -8,29 +8,20 @@ import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 
 public class IOsKeyResponse implements HasResourceIdAndPath<Key> {
-  private int id;
+  @JsonProperty("id")
+  private ResourceId<Key> resourceId;
   private String title;
   @JsonProperty("default")
   private boolean defaultKey;
   @JsonProperty("cert_name")
   private String certificateName;
   private String provision;
-  private String link;
+  @JsonProperty("link")
+  private ResourcePath<Key> resourcePath;
 
   @Override
   public ResourcePath<Key> getResourcePath() {
-    return new ResourcePath<Key>(link);
-  }
-
-  public String getLink() {
-    return link;
-  }
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
+    return resourcePath;
   }
 
   public String getTitle() {
@@ -67,6 +58,15 @@ public class IOsKeyResponse implements HasResourceIdAndPath<Key> {
 
   @Override
   public ResourceId<Key> getResourceId() {
-    return new ResourceId<Key>(id);
+    return resourceId;
   }
+
+  public void setResourceId(ResourceId<Key> resourceId) {
+    this.resourceId = resourceId;
+  }
+
+  public void setResourcePath(ResourcePath<Key> resourcePath) {
+    this.resourcePath = resourcePath;
+  }
+
 }

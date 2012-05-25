@@ -7,7 +7,7 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 
-public class MeManager {
+public class MeManagerImpl implements MeManager {
 
 
   private static class TokenResponse {
@@ -18,15 +18,17 @@ public class MeManager {
     }
   }
 
-  public static final String API_V1_PATH = "/api/v1";
-  public static final String TOKEN_PATH = "/token";
   private static final String TOKEN_PARAM = "auth_token";
 
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.MeManager#createRootWebResource(java.lang.String, java.lang.String)
+   */
+  @Override
   public WebResource createRootWebResource(String username, String password) {
     // create a DefaultApacheHttpClientConfig (instead of just a ClientConfig)
     DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
     // configure it to use the fiddler proxy
-    config.getProperties().put(DefaultApacheHttpClientConfig.PROPERTY_PROXY_URI, "http://127.0.0.1:8888");
+    // config.getProperties().put(DefaultApacheHttpClientConfig.PROPERTY_PROXY_URI, "http://127.0.0.1:8888");
     // configure it to parse JSON to POJOs
     config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
     // configure to follow re-directs (used for downloading packages)
@@ -49,6 +51,10 @@ public class MeManager {
     return resource.path(TOKEN_PATH).post(TokenResponse.class);
   }
 
+  /* (non-Javadoc)
+   * @see com.github.chrisprice.phonegapbuild.api.managers.MeManager#requestMe(com.sun.jersey.api.client.WebResource)
+   */
+  @Override
   public MeResponse requestMe(WebResource resource) {
     return resource.path(API_V1_PATH).get(MeResponse.class);
   }

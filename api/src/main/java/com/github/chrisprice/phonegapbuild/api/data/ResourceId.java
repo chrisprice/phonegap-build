@@ -25,4 +25,26 @@ public class ResourceId<T extends AbstractResource> {
     return Integer.toString(id);
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + id;
+    return result;
+  }
+
+  @SuppressWarnings("rawtypes")
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    ResourceId other = (ResourceId) obj;
+    if (id != other.id)
+      return false;
+    return true;
+  }
 }

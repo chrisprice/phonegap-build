@@ -1,8 +1,8 @@
 package com.github.chrisprice.phonegapbuild.plugin;
 
 import java.io.File;
+import java.util.Arrays;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -14,16 +14,24 @@ import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
+import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.apps.AppDetailsRequest;
-import com.github.chrisprice.phonegapbuild.api.data.apps.AppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyRequest;
+import com.github.chrisprice.phonegapbuild.api.data.me.MePlatformResponse;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
+import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
+import com.github.chrisprice.phonegapbuild.api.managers.AppsManagerImpl;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
+import com.github.chrisprice.phonegapbuild.api.managers.KeysManagerImpl;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
+import com.github.chrisprice.phonegapbuild.api.managers.MeManagerImpl;
+import com.github.chrisprice.phonegapbuild.plugin.utils.AppDownloader;
+import com.github.chrisprice.phonegapbuild.plugin.utils.AppUploadPackager;
 import com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys;
+import com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeysImpl;
 import com.github.chrisprice.phonegapbuild.plugin.utils.FileResourceIdStore;
 import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
@@ -144,7 +152,7 @@ public class BuildMojo extends AbstractMojo {
    * 
    * @parameter
    */
-  private String[] includes;
+  private String[] warIncludes;
 
   /**
    * A set of file patterns to exclude from the zip.
@@ -153,7 +161,7 @@ public class BuildMojo extends AbstractMojo {
    * 
    * @parameter
    */
-  private String[] excludes = new String[] {"WEB-INF/**/*", "WEB-INF"};
+  private String[] warExcludes = new String[] {"WEB-INF/**/*", "WEB-INF"};
 
   /**
    * The platforms to build for.
@@ -164,89 +172,129 @@ public class BuildMojo extends AbstractMojo {
    */
   private String[] platforms = new String[] {"android", "blackberry", "ios", "symbian", "webos", "winphone"};
 
-  private AppsManager appsManager = new AppsManager();
-  private MeManager meManager = new MeManager();
-  private KeysManager keysManager = new KeysManager();
-  private FetchKeys fetchKeys = new FetchKeys();
+  private AppsManager appsManager = new AppsManagerImpl();
+  private MeManager meManager = new MeManagerImpl();
+  private KeysManager keysManager = new KeysManagerImpl();
+  private FetchKeys fetchKeys = new FetchKeysImpl();
   private ResourceIdStore<App> appIdStore = new FileResourceIdStore<App>();
   private ResourceIdStore<Key> keyIdStore = new FileResourceIdStore<Key>();
+  private AppUploadPackager appUploadPackager = new AppUploadPackager();
+  private AppDownloader appDownloader = new AppDownloader();
 
   public void execute() throws MojoExecutionException, MojoFailureException {
+    ensureWorkingDirectory();
+
     getLog().debug("Creating zip for upload to cloud.");
 
-    final File appSource = createUploadPackage();
+    appUploadPackager.setConfigFile(configFile);
+    appUploadPackager.setWarDirectory(warDirectory);
+    appUploadPackager.setWarExcludes(warExcludes);
+    appUploadPackager.setWarIncludes(warIncludes);
+    appUploadPackager.setWorkingDirectory(workingDirectory);
+    appUploadPackager.setZipArchiver(zipArchiver);
+    File appSource = appUploadPackager.createUploadPackage();
 
     getLog().debug("Authenticating.");
-
     WebResource webResource = meManager.createRootWebResource(username, password);
 
     getLog().debug("Requesting summary from cloud.");
-
     MeResponse me = meManager.requestMe(webResource);
 
     getLog().debug("Checking for existing app.");
-
     appIdStore.setAlias("app");
     appIdStore.setWorkingDirectory(workingDirectory);
     HasResourceIdAndPath<App> appSummary = appIdStore.load(me.getApps().getAll());
 
-    AppResponse appDetails = null;
-    if (appSummary != null) {
+    if (appSummary == null) {
+      ResourceId<Key> iOsKeyId = null;
 
-      getLog().info("Starting upload to existing app id " + appSummary.getResourceId());
-
-      appDetails = appsManager.putApp(webResource, appSummary.getResourcePath(), null, appSource);
-
-    } else {
-
-      getLog().debug("Checking for existing ios key.");
-
-      keyIdStore.setAlias("ios-key");
-      keyIdStore.setWorkingDirectory(workingDirectory);
-
-      HasResourceIdAndPath<Key> iOsKey = keyIdStore.load(me.getKeys().getIos().getAll());
-      if (iOsKey == null && keys != null) {
-        getLog().debug("Fetching keys dependencies");
-
-        fetchKeys.setIncludes(keys);
-        fetchKeys.setProject(project);
-        fetchKeys.setTargetDirectory(workingDirectory);
-        fetchKeys.setZipUnArchiver(zipUnArchiver);
-        fetchKeys.execute();
-      }
-
-      if (iOsKey == null) {
-        getLog().debug("Building iOS key upload request.");
-
-        IOsKeyRequest iOsKeyRequest = createIOsKeyUploadRequest();
-
-        getLog().debug("iOS key not found, uploading.");
-
-        iOsKey =
-            keysManager.postNewKey(webResource, me.getKeys().getIos().getResourcePath(), iOsKeyRequest, iOsCertificate,
-                iOsMobileProvision);
-
-        getLog().info("Storing new iOS key id " + iOsKey.getResourceId());
-
-        keyIdStore.save(iOsKey.getResourceId());
+      getLog().debug("Ensuring ios key exists if it is a target platform.");
+      if (iOsIsATargetPlatform()) {
+        MePlatformResponse iosKeys = me.getKeys().getIos();
+        iOsKeyId = ensureIOsKey(webResource, iosKeys.getResourcePath(), iosKeys.getAll());
       }
 
       getLog().debug("Building upload request.");
-
-      AppDetailsRequest appDetailsRequest = createNewAppUploadDetails(iOsKey.getResourceId());
+      AppDetailsRequest appDetailsRequest = createAppDetailsRequest(iOsKeyId);
 
       getLog().info("Starting upload.");
+      appSummary = appsManager.postNewApp(webResource, me.getApps().getResourcePath(), appDetailsRequest, appSource);
 
-      appDetails = appsManager.postNewApp(webResource, me.getApps().getResourcePath(), appDetailsRequest, appSource);
-
-      getLog().info("Storing new app id " + appDetails.getResourceId());
-
-      appIdStore.save(appDetails.getResourceId());
+      getLog().info("Storing new app id " + appSummary.getResourceId());
+      appIdStore.save(appSummary.getResourceId());
+    } else {
+      getLog().info("Starting upload to existing app id " + appSummary.getResourceId());
+      appsManager.putApp(webResource, appSummary.getResourcePath(), null, appSource);
     }
 
     getLog().info("Starting downloads.");
+    appDownloader.setAppsManager(appsManager);
+    appDownloader.setMavenProjectHelper(mavenProjectHelper);
+    appDownloader.setProject(project);
+    appDownloader.setWorkingDirectory(workingDirectory);
+    appDownloader.downloadArtifacts(webResource, appSummary.getResourcePath(), Platform.get(platforms));
+  }
 
-    downloadArtifacts(webResource, appDetails);
+  private void ensureWorkingDirectory() {
+    if (!workingDirectory.exists()) {
+      if (!workingDirectory.mkdirs()) {
+        throw new RuntimeException("Could not create working directory at " + workingDirectory.getAbsolutePath() + ".");
+      }
+    } else {
+      if (!workingDirectory.isDirectory()) {
+        throw new RuntimeException("Working directory is not a directory " + workingDirectory.getAbsolutePath() + ".");
+      }
+    }
+  }
+
+  private boolean iOsIsATargetPlatform() {
+    return Arrays.asList(platforms).contains(Platform.IOS.getValue());
+  }
+
+  ResourceId<Key> ensureIOsKey(WebResource webResource, ResourcePath<PlatformKeys> keysResource,
+      HasResourceIdAndPath<Key>[] keyResources) throws MojoExecutionException, MojoFailureException {
+    getLog().debug("Checking for existing ios key.");
+    keyIdStore.setAlias("ios-key");
+    keyIdStore.setWorkingDirectory(workingDirectory);
+    HasResourceIdAndPath<Key> iOsKey = keyIdStore.load(keyResources);
+
+    if (iOsKey != null) {
+      return iOsKey.getResourceId();
+    }
+
+    if (keys != null) {
+      getLog().debug("Fetching keys dependencies");
+      fetchKeys.setIncludes(keys);
+      fetchKeys.setProject(project);
+      fetchKeys.setTargetDirectory(workingDirectory);
+      fetchKeys.setZipUnArchiver(zipUnArchiver);
+      fetchKeys.execute();
+    }
+
+    if (iOsCertificate == null || !iOsCertificate.exists()) {
+      String path = iOsCertificate == null ? null : iOsCertificate.getAbsolutePath();
+      throw new MojoFailureException("iOsCertificate does not exist " + path + ".");
+    }
+
+    if (iOsMobileProvision == null || !iOsMobileProvision.exists()) {
+      String path = iOsMobileProvision == null ? null : iOsMobileProvision.getAbsolutePath();
+      throw new MojoFailureException("iOsMobileProvision does not exist " + path + ".");
+    }
+
+    if (iOsCertificatePassword == null || iOsCertificatePassword.isEmpty()) {
+      throw new MojoFailureException("iOsCertificatePassword not defined or blank.");
+    }
+
+    getLog().debug("Building iOS key upload request.");
+    IOsKeyRequest iOsKeyRequest = createIOsKeyUploadRequest();
+
+    getLog().debug("iOS key not found, uploading.");
+    iOsKey = keysManager.postNewKey(webResource, keysResource, iOsKeyRequest, iOsCertificate, iOsMobileProvision);
+
+    getLog().info("Storing new iOS key id " + iOsKey.getResourceId());
+    keyIdStore.save(iOsKey.getResourceId());
+
+    return iOsKey.getResourceId();
   }
 
   private IOsKeyRequest createIOsKeyUploadRequest() {
@@ -256,47 +304,18 @@ public class BuildMojo extends AbstractMojo {
     return iOsKeyRequest;
   }
 
-  private void downloadArtifacts(WebResource webResource, AppResponse appDetails) throws MojoFailureException {
-    for (String value : this.platforms) {
-      Platform platform = Platform.get(value);
-      if (platform == null) {
-        throw new MojoFailureException("Unknown platform specified " + value);
-      }
-      getLog().info("Downloading binary for " + platform.getValue());
-      // download the app
-      File app = appsManager.downloadApp(webResource, appDetails.getResourcePath(), platform, workingDirectory);
-      // attach it to the project with the appropriate classifier (platform) and type (extension)
-      mavenProjectHelper.attachArtifact(project, FilenameUtils.getExtension(app.getName()), platform.getValue(), app);
-    }
-  }
-
-  private AppDetailsRequest createNewAppUploadDetails(ResourceId<Key> iOsKeyId) {
+  private AppDetailsRequest createAppDetailsRequest(ResourceId<Key> iOsKeyId) {
     AppDetailsRequest appDetailsRequest = new AppDetailsRequest();
     appDetailsRequest.setCreateMethod("file");
     appDetailsRequest.setTitle(appTitle);
+    AppDetailsRequest.Keys keys = new AppDetailsRequest.Keys();
     if (iOsKeyId != null) {
-      AppDetailsRequest.Keys keys = new AppDetailsRequest.Keys();
       keys.setIos(iOsKeyId.getId());
-      appDetailsRequest.setKeys(keys);
     }
+    appDetailsRequest.setKeys(keys);
     return appDetailsRequest;
   }
 
-  private File createUploadPackage() throws MojoExecutionException {
-    workingDirectory.mkdirs();
-
-    File file = new File(workingDirectory, "file.zip");
-
-    try {
-      zipArchiver.addDirectory(warDirectory, includes, excludes);
-      zipArchiver.addFile(configFile, "config.xml");
-      zipArchiver.setDestFile(file);
-      zipArchiver.createArchive();
-    } catch (Exception e) {
-      throw new MojoExecutionException("Could not zip", e);
-    }
-    return file;
-  }
 
   public void setZipArchiver(ZipArchiver zipArchiver) {
     this.zipArchiver = zipArchiver;
@@ -326,12 +345,12 @@ public class BuildMojo extends AbstractMojo {
     this.warDirectory = warDirectory;
   }
 
-  public void setIncludes(String[] includes) {
-    this.includes = includes;
+  public void setWarIncludes(String[] includes) {
+    this.warIncludes = includes;
   }
 
-  public void setExcludes(String[] excludes) {
-    this.excludes = excludes;
+  public void setWarExcludes(String[] excludes) {
+    this.warExcludes = excludes;
   }
 
   public void setAppsManager(AppsManager appsManager) {

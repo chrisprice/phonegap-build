@@ -9,6 +9,7 @@ import junit.framework.TestCase;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
+import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeAppResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 
@@ -53,7 +54,7 @@ public class FileResourceIdStoreTest extends TestCase {
     MeAppResponse[] meAppResponses = new MeAppResponse[1];
     {
       MeAppResponse meAppResponse = new MeAppResponse();
-      meAppResponse.setId(id);
+      meAppResponse.setResourceId(new ResourceId<App>(id));
       meAppResponses[0] = meAppResponse;
     }
     return meAppResponses;

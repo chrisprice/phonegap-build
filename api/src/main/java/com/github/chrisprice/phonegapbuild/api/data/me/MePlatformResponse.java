@@ -1,20 +1,23 @@
 package com.github.chrisprice.phonegapbuild.api.data.me;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import com.github.chrisprice.phonegapbuild.api.data.HasResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 
 public class MePlatformResponse implements HasResourcePath<PlatformKeys> {
   private MeKeyResponse[] all;
-  private String link;
+  @JsonProperty("link")
+  private ResourcePath<PlatformKeys> resourcePath;
 
   @Override
   public ResourcePath<PlatformKeys> getResourcePath() {
-    return new ResourcePath<PlatformKeys>(link);
+    return resourcePath;
   }
 
-  public String getLink() {
-    return link;
+  public void setResourcePath(ResourcePath<PlatformKeys> resourcePath) {
+    this.resourcePath = resourcePath;
   }
   public MeKeyResponse[] getAll() {
     return all;

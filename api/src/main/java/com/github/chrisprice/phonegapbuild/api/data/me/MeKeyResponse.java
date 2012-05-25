@@ -10,17 +10,30 @@ import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 
 public class MeKeyResponse implements HasResourceIdAndPath<Key> {
 
-  @JsonProperty("id")
-  private ResourceId<Key> resourceId;
   @JsonProperty("default")
   private boolean defaultKey;
   private String title;
+  @JsonProperty("id")
+  private ResourceId<Key> resourceId;
   @JsonProperty("link")
   private ResourcePath<Key> resourcePath;
 
   @Override
+  public ResourceId<Key> getResourceId() {
+    return resourceId;
+  }
+
+  public void setResourceId(ResourceId<Key> resourceId) {
+    this.resourceId = resourceId;
+  }
+
+  @Override
   public ResourcePath<Key> getResourcePath() {
     return resourcePath;
+  }
+
+  public void setResourcePath(ResourcePath<Key> resourcePath) {
+    this.resourcePath = resourcePath;
   }
 
   public String getTitle() {
@@ -31,25 +44,12 @@ public class MeKeyResponse implements HasResourceIdAndPath<Key> {
     this.title = title;
   }
 
-  @Override
-  public ResourceId<Key> getResourceId() {
-    return resourceId;
-  }
-
   public boolean isDefaultKey() {
     return defaultKey;
   }
 
   public void setDefaultKey(boolean defaultKey) {
     this.defaultKey = defaultKey;
-  }
-
-  public void setResourceId(ResourceId<Key> resourceId) {
-    this.resourceId = resourceId;
-  }
-
-  public void setResourcePath(ResourcePath<Key> resourcePath) {
-    this.resourcePath = resourcePath;
   }
 
 }

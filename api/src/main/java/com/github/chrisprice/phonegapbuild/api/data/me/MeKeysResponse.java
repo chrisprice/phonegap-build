@@ -1,5 +1,7 @@
 package com.github.chrisprice.phonegapbuild.api.data.me;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import com.github.chrisprice.phonegapbuild.api.data.HasResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Keys;
@@ -8,15 +10,16 @@ public class MeKeysResponse implements HasResourcePath<Keys> {
   private MePlatformResponse ios;
   private MePlatformResponse blackberry;
   private MePlatformResponse android;
-  private String link;
+  @JsonProperty("link")
+  private ResourcePath<Keys> resourcePath;
 
   @Override
   public ResourcePath<Keys> getResourcePath() {
-    return new ResourcePath<Keys>(link);
+    return resourcePath;
   }
 
-  public String getLink() {
-    return link;
+  public void setResourcePath(ResourcePath<Keys> resourcePath) {
+    this.resourcePath = resourcePath;
   }
   public MePlatformResponse getIos() {
     return ios;

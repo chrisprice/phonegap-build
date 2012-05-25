@@ -134,7 +134,8 @@ public class BuildMojo extends AbstractMojo {
   private String keys;
 
   /**
-   * The application title. Can also be overridden in the config file.
+   * The application title, defaults to the final name of the app but will be overridden by any title specified in the
+   * config file.
    * 
    * @parameter expression="${project.build.finalName}"
    */

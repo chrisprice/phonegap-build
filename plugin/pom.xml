@@ -13,7 +13,7 @@
 
 	<name>PhoneGap Build Maven Plugin</name>
 	<description>A Maven Plugin which makes use of the API to turn WAR projects into binaries for mobile platforms.</description>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.github.chrisprice</groupId>
@@ -60,15 +60,4 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>

@@ -10,7 +10,7 @@
 	<name>PhoneGap Build Java API and Maven Plugin</name>
 	<description>This project aims to provide a stand-alone Java API for communicating with the PhoneGap Build REST API and a Maven Plugin which makes use of the API to turn WAR projects into binaries for mobile platforms.</description>
 	<url>https://github.com/chrisprice/phonegap-build</url>
-	
+
 	<licenses>
 		<license>
 			<name>Apache 2</name>
@@ -19,7 +19,7 @@
 			<comments>A business-friendly OSS license</comments>
 		</license>
 	</licenses>
-	
+
 	<scm>
 		<connection>scm:git:git://github.com/chrisprice/phonegap-build.git</connection>
 		<developerConnection>scm:git:git://github.com/chrisprice/phonegap-build.git</developerConnection>
@@ -34,10 +34,34 @@
 			<organizationUrl>http://scottlogic.co.uk</organizationUrl>
 		</developer>
 	</developers>
-	
+
 	<modules>
 		<module>api</module>
 		<module>plugin</module>
 	</modules>
 
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -34,6 +34,10 @@
 						</goals>
 						<configuration>
 							<keys>com.scottlogic.mobile:certificates</keys>
+							<platforms>
+								<platform>android</platform>
+								<platform>ios</platform>
+							</platforms>
 						</configuration>
 					</execution>
 				</executions>

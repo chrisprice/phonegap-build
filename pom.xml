@@ -23,7 +23,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/chrisprice/phonegap-build.git</connection>
 		<developerConnection>scm:git:git@github.com:chrisprice/phonegap-build.git</developerConnection>
-		<url>https://github.com/chrisprice/phonegap-build</url>
+		<url>git@github.com:chrisprice/phonegap-build.git</url>
 	</scm>
 
 	<developers>

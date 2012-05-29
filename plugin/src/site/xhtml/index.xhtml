@@ -14,6 +14,10 @@
 		for communicating with the PhoneGap Build REST API.
 	</p>
 
+	<p>The only requirements on your project are that it is of
+		packaging war and and index.html page is available in
+		src/main/webapp/index.html.</p>
+
 	<h3>PhoneGap Build</h3>
 
 	<p>
@@ -104,9 +108,8 @@
 	</p>
 
 	<p>The plugin expects to find the configuration file for the
-		project at src/main/phonegap-build/config.xml*. However, this location
-		can (and probably should until #3 is fixed) be customised using the
-		configFile parameter -</p>
+		project at src/main/phonegap-build/config.xml. However, this location
+		can be customised using the configFile parameter -</p>
 
 	<pre>&lt;plugin&gt;
 	&lt;groupId&gt;com.github.chrisprice&lt;/groupId&gt;
@@ -120,19 +123,11 @@
 				&lt;goal&gt;build&lt;/goal&gt;
 			&lt;/goals&gt;
 			&lt;configuration&gt;
-				&lt;configFile&gt;src/phonegap-build/config.xml&lt;/configFile&gt;
+				&lt;configFile&gt;src/main/resources/config.xml&lt;/configFile&gt;
 			&lt;/configuration&gt;
 		&lt;/execution&gt;
 	&lt;/executions&gt;
 &lt;/plugin&gt;</pre>
-
-	<p>
-		<i>* There is currently a bug raised <a
-			href="https://github.com/chrisprice/phonegap-build/issues/3">#3</a>
-			relating to changing over to use the standard maven location of
-			src/phonegap-build/config.xml instead of src/<b>main</b>/phonegap-build/config.xml.
-		</i>
-	</p>
 
 	<h3>Platform Support</h3>
 	<p>The plugin currently supports building for the following

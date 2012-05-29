@@ -59,4 +59,17 @@
 		</dependency>
 	</dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<configuration>
+					<message>Generated site for ${project.artifactId} ${project.version}</message>
+					<path>${project.artifactId}</path>
+					<merge>true</merge>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

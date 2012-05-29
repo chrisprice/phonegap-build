@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>PhoneGap Build Maven Plugin</title>
+</head>
+<body>
+	<h2>Introduction</h2>
+
+	<p>
+		This project aims to provide a Maven plugin for building native
+		binaries for mobile platforms using PhoneGap Build. Internally it
+		makes use of the <a href="phonegap-build-api/index.html">Java API</a>
+		for communicating with the PhoneGap Build REST API.
+	</p>
+
+	<h3>PhoneGap Build</h3>
+
+	<p>
+		<a href="https://build.phonegap.com/">PhoneGap Build</a> is a hosted
+		service which wraps HTML5 applications into native applications. From
+		their website -
+	</p>
+	<ol>
+		<li>Write your app using HTML, CSS and JavaScript</li>
+		<li>Upload it to the PhoneGap Build service</li>
+		<li>Get back app-store ready apps for Apple iOS, Google Android,
+			Windows Phone 7, Palm, Symbian, Blackberry and more.</li>
+	</ol>
+	<p>
+		The service exposes a <a href="https://build.phonegap.com/api/">REST
+			API</a> allowing users to manage their keys and applications, trigger
+		builds and download the native binaries. The plugin connects to this
+		service, uploads the exploded WAR directory, waits for the builds to
+		complete and then downloads the native binaries installing/deploying
+		them as attached artifacts.
+	</p>
+
+	<h3>Installing the Plugin</h3>
+
+	<p>To configure the plugin to run as part of your build, add the
+		following to your pom -</p>
+	<pre>&lt;plugin&gt;
+	&lt;groupId&gt;com.github.chrisprice&lt;/groupId&gt;
+	&lt;artifactId&gt;phonegap-build-maven-plugin&lt;/artifactId&gt;
+	&lt;version&gt;0.0.1&lt;/version&gt; 
+	&lt;executions&gt;
+		&lt;execution&gt;
+			&lt;id&gt;phonegap-build&lt;/id&gt;
+			&lt;goals&gt;
+				&lt;goal&gt;clean&lt;/goal&gt;
+				&lt;goal&gt;build&lt;/goal&gt;
+			&lt;/goals&gt;
+		&lt;/execution&gt;
+	&lt;/executions&gt;
+&lt;/plugin&gt;</pre>
+
+	<p>The above execution binds the clean and build plugin goals to
+		their default lifecycle phases (which are pre-clean and package
+		respectively). The clean goal ensures the the server copy of the
+		project is cleaned when the local copy is cleaned. The build goal
+		handles uploading the application (and keys) and then downloading and
+		attaching the binaries.</p>
+
+	<p>N.B. The plugin will not work until you have configured the
+		authentication and supplied a configuration file.</p>
+
+	<h3>Authentication</h3>
+
+	<p>
+		To use the PhoneGap Build service you need to <a
+			href="https://build.phonegap.com/people/sign_up">sign up for an
+			account</a> and then configure the plugin with your credentials. The
+		plugin expects your username and password to be specified as <a
+			href="http://maven.apache.org/examples/injecting-properties-via-settings.html">properties
+			in your setttings.xml</a> -
+	</p>
+	<pre>&lt;properties&gt;
+	&lt;phonegap-build.username&gt;USERNAME&lt;/phonegap-build.username&gt;
+	&lt;phonegap-build.password&gt;PASSWORD&lt;/phonegap-build.password&gt;
+&lt;/properties&gt;</pre>
+
+	<p>Or on the command line as properties -</p>
+	<pre>mvn clean install -Dphonegap-build.username=USERNAME -Dphonegap-build.password=PASSWORD</pre>
+
+	<p>
+		<i>There is currently a bug raised <a
+			href="https://github.com/chrisprice/phonegap-build/issues/2">#2</a>
+			relating to changing over to use the standard maven technique of
+			servers to configure credentials.
+		</i>
+	</p>
+
+	<p>N.B. The plugin will not work until you have supplied a
+		configuration file.</p>
+
+	<h3>PhoneGap Build Config File</h3>
+
+	<p>
+		PhoneGap Build requires a config.xml file which sets some basic
+		application properties and some advanced per-platform settings. The
+		PhoneGap Build <a href="https://build.phonegap.com/docs/config-xml">config.xml
+			documentation</a> covers these settings in detail.
+	</p>
+
+	<p>The plugin expects to find the configuration file for the
+		project at src/main/phonegap-build/config.xml*. However, this location
+		can (and probably should until #3 is fixed) be customised using the
+		configFile parameter -</p>
+
+	<pre>&lt;plugin&gt;
+	&lt;groupId&gt;com.github.chrisprice&lt;/groupId&gt;
+	&lt;artifactId&gt;phonegap-build-maven-plugin&lt;/artifactId&gt;
+	&lt;version&gt;0.0.1&lt;/version&gt; 
+	&lt;executions&gt;
+		&lt;execution&gt;
+			&lt;id&gt;phonegap-build&lt;/id&gt;
+			&lt;goals&gt;
+				&lt;goal&gt;clean&lt;/goal&gt;
+				&lt;goal&gt;build&lt;/goal&gt;
+			&lt;/goals&gt;
+			&lt;configuration&gt;
+				&lt;configFile&gt;src/phonegap-build/config.xml&lt;/configFile&gt;
+			&lt;/configuration&gt;
+		&lt;/execution&gt;
+	&lt;/executions&gt;
+&lt;/plugin&gt;</pre>
+
+	<p>
+		<i>* There is currently a bug raised <a
+			href="https://github.com/chrisprice/phonegap-build/issues/3">#3</a>
+			relating to changing over to use the standard maven location of
+			src/phonegap-build/config.xml instead of src/<b>main</b>/phonegap-build/config.xml.
+		</i>
+	</p>
+
+	<h3>Platform Support</h3>
+	<p>The plugin currently supports building for the following
+		platforms -</p>
+	<ul>
+		<li>ios - Apple iOS (with signing keys, see Signing for iOS)</li>
+		<li>android - Google Android</li>
+		<li>winphone - Windows Phone 7</li>
+		<li>webos - Palm</li>
+		<li>symbian - Symbian</li>
+		<li>blackberry - Blackberry</li>
+	</ul>
+
+	<p>To specify which platforms the plugin will try to build for use
+		the platforms configuration parameter. If a platform is specified and
+		that platform can not be built by the service then the build will
+		fail. By default binaries for all platforms are built.</p>
+
+	<pre>&lt;configuration&gt;
+	&lt;platforms&gt;
+		&lt;platform&gt;ios&lt;/platform&gt;
+		&lt;platform&gt;android&lt;/platform&gt;
+		&lt;platform&gt;winphone&lt;/platform&gt;
+		&lt;platform&gt;webos&lt;/platform&gt;
+		&lt;platform&gt;symbian&lt;/platform&gt;
+		&lt;platform&gt;blackberry&lt;/platform&gt;
+	&lt;/platforms&gt;
+&lt;/configuration&gt;</pre>
+
+	<h3>Signing for iOS</h3>
+
+	<p>
+		In order to build an iOS binary the service requires a developer
+		certificate and provisioning profile (see <a
+			href="https://build.phonegap.com/docs/ios-builds">Building for
+			iOS</a>). The plugin will take care of uploading the certificate and
+		profile and then associating them with your application, but you need
+		to configure the plugin with the locations of those files.
+	</p>
+
+	<p>The simplest way of doing this is to put them in your
+		src/phonegap-build folder and reference each of them from the
+		configuration -</p>
+
+	<pre>&lt;configuration&gt;
+	&lt;iOsCertificate&gt;src/phonegap-build/ios.c12&lt;/iOsCertificate&gt;
+	&lt;iOsCertificatePassword&gt;PASSWORD&lt;/iOsCertificatePassword&gt;
+	&lt;iOsMobileProvision&gt;src/phonegap-build/ios.mobileprovision&lt;/iOsMobileProvision&gt;
+&lt;/configuration&gt;</pre>
+
+	<p>If you don't wish to include your certificate password in the
+		pom then it can be specified as a property in your settings.xml -</p>
+	<pre>&lt;properties&gt;
+	&lt;phonegap-build.ios.certificate.password&gt;PASSWORD&lt;/phonegap-build.ios.certificate.password&gt;
+&lt;/properties&gt;</pre>
+
+	<p>An alternative approach is to store the files in a maven zip
+		artifact, so that they can be shared between multiple projects (e.g.
+		for team provisioning). Firstly deploy a zip (i.e. type=zip) artifact
+		into your repository containing the following files in the root
+		folder, the filenames must match exactly -</p>
+	<ul>
+		<li>ios.c12 - Developer certificate</li>
+		<li>ios.mobileprovision - Provisioning profile</li>
+	</ul>
+
+	<p>Now add a provided dependency on the deployed artifact e.g. -</p>
+
+	<pre>&lt;dependency&gt;
+	&lt;groupId&gt;com.github.chrisprice&lt;/groupId&gt;
+	&lt;artifactId&gt;certificates&lt;/artifactId&gt;
+	&lt;version&gt;0.0.1&lt;/version&gt; 
+	&lt;type&gt;zip&lt;/type&gt;
+	&lt;scope&gt;provided&lt;/scope&gt;
+&lt;dependency&gt;</pre>
+
+	<p>Finally configure the plugin to use that artifact -</p>
+	<pre>&lt;configuration&gt;
+	&lt;keys&gt;com.github.chrisprice:certificates&lt;/keys&gt;
+&lt;/configuration&gt;</pre>
+
+	<h3>Scorch</h3>
+
+	<p>When the plugin is configured correctly it should take care of
+		clearing up any remotely created keys and applications when it is
+		finished with them (i.e. when you perform a clean). However, when
+		first getting started, or if something does goes go wrong, then the
+		scorch goal can come in handy.</p>
+
+	<p>Scorch will enumerate all of the keys and applications available
+		remotely and delete each one in turn. Once more to be clear, it will
+		delete all keys and applications on the server, not just those that
+		the plugin itself has created.</p>
+
+	<p>To run scorch execute the following -</p>
+
+	<pre>mvn phonegap-build:scorch</pre>
+</body>
+</html>

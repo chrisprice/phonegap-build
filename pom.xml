@@ -28,7 +28,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/chrisprice/phonegap-build.git</connection>
 		<developerConnection>scm:git:git@github.com:chrisprice/phonegap-build.git</developerConnection>
-		<url>http://github.com/chrisprice/phonegap-build.git</url>
+		<url>http://github.com/chrisprice/phonegap-build</url>
 	</scm>
 
 	<developers>
@@ -75,27 +75,8 @@
 					<reportPlugins>
 						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-project-info-reports-plugin</artifactId>
-							<version>2.2</version>
-							<configuration>
-								<dependencyDetailsEnabled>true</dependencyDetailsEnabled>
-								<dependencyLocationsEnabled>true</dependencyLocationsEnabled>
-							</configuration>
-						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-javadoc-plugin</artifactId>
 							<version>2.7</version>
-						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-surefire-report-plugin</artifactId>
-							<version>2.6</version>
-						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-checkstyle-plugin</artifactId>
-							<version>2.6</version>
 						</plugin>
 						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
@@ -111,7 +92,6 @@
 				<version>0.6</version>
 				<configuration>
 					<message>Generated site for ${project.artifactId} ${project.version}</message>
-					<path>phonegap-build</path>
 					<merge>false</merge>
 				</configuration>
 				<executions>

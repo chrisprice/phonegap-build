@@ -200,6 +200,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
 
     getLog().info("Starting downloads.");
     appDownloader.setAppsManager(appsManager);
+    appDownloader.setProject(project);
     appDownloader.setWorkingDirectory(workingDirectory);
     appDownloader.downloadArtifacts(webResource, appSummary.getResourcePath(), Platform.get(platforms));
   }

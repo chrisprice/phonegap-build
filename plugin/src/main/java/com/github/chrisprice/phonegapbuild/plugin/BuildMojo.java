@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 
 import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
@@ -60,16 +61,25 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
   private File workingDirectory;
 
   /**
-   * iOS p12 certificate
+   * iOS certificate server id (used in preference to iOsCertificate*)
+   * 
+   * @parameter expression="${phonegap-build.ios.server}"
+   */
+  private String iOsServer;
+
+  /**
+   * iOS p12 certificate. Deprecated - use iOsServer instead.
    * 
    * @parameter expression="${project.build.directory}/phonegap-build/ios.p12"
+   * @deprecated
    */
   private File iOsCertificate;
 
   /**
-   * iOS certificate password
+   * iOS certificate password. Deprecated - use iOsServer instead.
    * 
    * @parameter expression="${phonegap-build.ios.certificate.password}"
+   * @deprecated
    */
   private String iOsCertificatePassword;
 
@@ -240,22 +250,44 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
       fetchKeys.execute();
     }
 
+    File iOsCertificate;
+    String iOsCertificatePassword;
+
+    if (iOsServer != null) {
+      AuthenticationInfo info = wagonManager.getAuthenticationInfo(iOsServer);
+      if (info == null) {
+        throw new RuntimeException("Server not found in settings.xml " + iOsServer + ".");
+      }
+      if (info.getPrivateKey() == null) {
+        throw new RuntimeException("No private key found for server " + iOsServer + ".");
+      }
+      iOsCertificate = new File(info.getPrivateKey());
+      if (info.getPassphrase() == null) {
+        throw new RuntimeException("No passphrase found for server " + iOsServer + ".");
+      }
+      iOsCertificatePassword = info.getPassphrase();
+    } else {
+      getLog().warn("iOsServer not specified, falling back to iOsCertificate/iOsCertificatePassword.");
+      iOsCertificate = this.iOsCertificate;
+      iOsCertificatePassword = this.iOsCertificatePassword;
+    }
+
     if (iOsCertificate == null || !iOsCertificate.exists()) {
       String path = iOsCertificate == null ? null : iOsCertificate.getAbsolutePath();
-      throw new MojoFailureException("iOsCertificate does not exist " + path + ".");
+      throw new MojoFailureException("ios certificate does not exist " + path + ".");
+    }
+
+    if (iOsCertificatePassword == null || iOsCertificatePassword.isEmpty()) {
+      throw new MojoFailureException("ios certificate password not defined or blank.");
     }
 
     if (iOsMobileProvision == null || !iOsMobileProvision.exists()) {
       String path = iOsMobileProvision == null ? null : iOsMobileProvision.getAbsolutePath();
-      throw new MojoFailureException("iOsMobileProvision does not exist " + path + ".");
-    }
-
-    if (iOsCertificatePassword == null || iOsCertificatePassword.isEmpty()) {
-      throw new MojoFailureException("iOsCertificatePassword not defined or blank.");
+      throw new MojoFailureException("ios mobileprovision does not exist " + path + ".");
     }
 
     getLog().debug("Building iOS key upload request.");
-    IOsKeyRequest iOsKeyRequest = createIOsKeyUploadRequest();
+    IOsKeyRequest iOsKeyRequest = createIOsKeyUploadRequest(appTitle, iOsCertificatePassword);
 
     getLog().debug("iOS key not found, uploading.");
     iOsKey = keysManager.postNewKey(webResource, keysResource, iOsKeyRequest, iOsCertificate, iOsMobileProvision);
@@ -266,7 +298,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     return iOsKey.getResourceId();
   }
 
-  private IOsKeyRequest createIOsKeyUploadRequest() {
+  private IOsKeyRequest createIOsKeyUploadRequest(String appTitle, String iOsCertificatePassword) {
     IOsKeyRequest iOsKeyRequest = new IOsKeyRequest();
     iOsKeyRequest.setTitle(appTitle);
     iOsKeyRequest.setPassword(iOsCertificatePassword);
@@ -284,7 +316,6 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     appDetailsRequest.setKeys(keys);
     return appDetailsRequest;
   }
-
 
   public void setProject(MavenProject project) {
     this.project = project;

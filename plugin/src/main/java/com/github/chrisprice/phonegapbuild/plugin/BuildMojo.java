@@ -6,9 +6,6 @@ import java.util.Arrays;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
-import org.codehaus.plexus.archiver.zip.ZipArchiver;
-import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 
 import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
@@ -24,8 +21,6 @@ import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.plugin.utils.AppDownloader;
 import com.github.chrisprice.phonegapbuild.plugin.utils.AppUploadPackager;
 import com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys;
-import com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeysImpl;
-import com.github.chrisprice.phonegapbuild.plugin.utils.FileResourceIdStore;
 import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
 
@@ -41,25 +36,6 @@ import com.sun.jersey.api.client.WebResource;
  * @requiresDependencyResolution compile
  */
 public class BuildMojo extends AbstractPhoneGapBuildMojo {
-
-  /**
-   * The Zip archiver.
-   * 
-   * @component role="org.codehaus.plexus.archiver.Archiver" roleHint="zip"
-   */
-  private ZipArchiver zipArchiver;
-
-  /**
-   * The Zip un-archiver.
-   * 
-   * @component role="org.codehaus.plexus.archiver.UnArchiver" roleHint="zip"
-   */
-  private ZipUnArchiver zipUnArchiver;
-
-  /**
-   * @component
-   */
-  private MavenProjectHelper mavenProjectHelper;
 
   /**
    * @parameter default-value="${project}"
@@ -152,11 +128,30 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
    */
   private String[] platforms = new String[] {"android", "blackberry", "ios", "symbian", "webos", "winphone"};
 
-  private FetchKeys fetchKeys = new FetchKeysImpl();
-  private ResourceIdStore<App> appIdStore = new FileResourceIdStore<App>();
-  private ResourceIdStore<Key> keyIdStore = new FileResourceIdStore<Key>();
-  private AppUploadPackager appUploadPackager = new AppUploadPackager();
-  private AppDownloader appDownloader = new AppDownloader();
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys"
+   */
+  private FetchKeys fetchKeys;
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore"
+   */
+  private ResourceIdStore<App> appIdStore;
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore"
+   */
+  private ResourceIdStore<Key> keyIdStore;
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.AppUploadPackager"
+   */
+  private AppUploadPackager appUploadPackager;
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.AppDownloader"
+   */
+  private AppDownloader appDownloader;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     ensureWorkingDirectory();
@@ -168,7 +163,6 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     appUploadPackager.setWarExcludes(warExcludes);
     appUploadPackager.setWarIncludes(warIncludes);
     appUploadPackager.setWorkingDirectory(workingDirectory);
-    appUploadPackager.setZipArchiver(zipArchiver);
     File appSource = appUploadPackager.createUploadPackage();
 
     getLog().debug("Authenticating.");
@@ -206,8 +200,6 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
 
     getLog().info("Starting downloads.");
     appDownloader.setAppsManager(appsManager);
-    appDownloader.setMavenProjectHelper(mavenProjectHelper);
-    appDownloader.setProject(project);
     appDownloader.setWorkingDirectory(workingDirectory);
     appDownloader.downloadArtifacts(webResource, appSummary.getResourcePath(), Platform.get(platforms));
   }
@@ -244,7 +236,6 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
       fetchKeys.setIncludes(keys);
       fetchKeys.setProject(project);
       fetchKeys.setTargetDirectory(workingDirectory);
-      fetchKeys.setZipUnArchiver(zipUnArchiver);
       fetchKeys.execute();
     }
 
@@ -294,14 +285,6 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
   }
 
 
-  public void setZipArchiver(ZipArchiver zipArchiver) {
-    this.zipArchiver = zipArchiver;
-  }
-
-  public void setMavenProjectHelper(MavenProjectHelper mavenProjectHelper) {
-    this.mavenProjectHelper = mavenProjectHelper;
-  }
-
   public void setProject(MavenProject project) {
     this.project = project;
   }
@@ -328,10 +311,6 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
 
   public void setWarExcludes(String[] excludes) {
     this.warExcludes = excludes;
-  }
-
-  public void setZipUnArchiver(ZipUnArchiver zipUnArchiver) {
-    this.zipUnArchiver = zipUnArchiver;
   }
 
   public void setiOsCertificate(File iOsCertificate) {

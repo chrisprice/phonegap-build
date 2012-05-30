@@ -9,7 +9,6 @@ import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
-import com.github.chrisprice.phonegapbuild.plugin.utils.FileResourceIdStore;
 import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
 
@@ -28,8 +27,15 @@ public class CleanMojo extends AbstractPhoneGapBuildMojo {
    */
   private File workingDirectory;
 
-  private ResourceIdStore<App> appIdStore = new FileResourceIdStore<App>();
-  private ResourceIdStore<Key> keyIdStore = new FileResourceIdStore<Key>();
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore"
+   */
+  private ResourceIdStore<App> appIdStore;
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore"
+   */
+  private ResourceIdStore<Key> keyIdStore;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     getLog().debug("Authenticating.");

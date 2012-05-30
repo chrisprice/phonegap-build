@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.component.annotations.Component;
 
 import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.resources.AbstractResource;
 
+@Component(role = ResourceIdStore.class, hint = "file")
 public class FileResourceIdStore<T extends AbstractResource> implements ResourceIdStore<T> {
   private String alias;
 

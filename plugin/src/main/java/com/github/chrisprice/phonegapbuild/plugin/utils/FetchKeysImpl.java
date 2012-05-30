@@ -8,12 +8,20 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
+import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
+@Component(role = FetchKeys.class)
 public class FetchKeysImpl implements FetchKeys {
 
-  private ZipUnArchiver zipUnArchiver;
+  @Requirement(hint = "zip")
+  private UnArchiver zipUnArchiver;
+
+  /**
+   * The maven project
+   */
   private MavenProject project;
   /**
    * The directory to unpack all the archives to.
@@ -25,9 +33,6 @@ public class FetchKeysImpl implements FetchKeys {
   private String includes;
 
 
-  /* (non-Javadoc)
-   * @see com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys#execute()
-   */
   public void execute() throws MojoExecutionException, MojoFailureException {
     targetDirectory.mkdirs();
     zipUnArchiver.setDestDirectory(targetDirectory);
@@ -55,30 +60,19 @@ public class FetchKeysImpl implements FetchKeys {
     }
   }
 
-  /* (non-Javadoc)
-   * @see com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys#setZipUnArchiver(org.codehaus.plexus.archiver.zip.ZipUnArchiver)
-   */
-  public void setZipUnArchiver(ZipUnArchiver zipUnArchiver) {
+  public void setZipUnArchiver(UnArchiver zipUnArchiver) {
     this.zipUnArchiver = zipUnArchiver;
   }
 
-  /* (non-Javadoc)
-   * @see com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys#setProject(org.apache.maven.project.MavenProject)
-   */
+  @Override
   public void setProject(MavenProject project) {
     this.project = project;
   }
 
-  /* (non-Javadoc)
-   * @see com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys#setTargetDirectory(java.io.File)
-   */
   public void setTargetDirectory(File targetDirectory) {
     this.targetDirectory = targetDirectory;
   }
 
-  /* (non-Javadoc)
-   * @see com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys#setIncludes(java.lang.String)
-   */
   public void setIncludes(String includes) {
     this.includes = includes;
   }

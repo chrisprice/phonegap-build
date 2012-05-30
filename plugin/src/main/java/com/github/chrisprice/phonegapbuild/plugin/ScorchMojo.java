@@ -1,6 +1,5 @@
 package com.github.chrisprice.phonegapbuild.plugin;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -8,12 +7,6 @@ import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
-import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
-import com.github.chrisprice.phonegapbuild.api.managers.AppsManagerImpl;
-import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
-import com.github.chrisprice.phonegapbuild.api.managers.KeysManagerImpl;
-import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
-import com.github.chrisprice.phonegapbuild.api.managers.MeManagerImpl;
 import com.sun.jersey.api.client.WebResource;
 
 /**
@@ -22,29 +15,11 @@ import com.sun.jersey.api.client.WebResource;
  * @goal scorch
  * @requiresProject false
  */
-public class ScorchMojo extends AbstractMojo {
-
-  /**
-   * PhoneGap Build username
-   * 
-   * @parameter expression="${phonegap-build.username}"
-   */
-  private String username;
-
-  /**
-   * PhoneGap Build password
-   * 
-   * @parameter expression="${phonegap-build.password}"
-   */
-  private String password;
-
-  private AppsManager appsManager = new AppsManagerImpl();
-  private MeManager meManager = new MeManagerImpl();
-  private KeysManager keysManager = new KeysManagerImpl();
+public class ScorchMojo extends AbstractPhoneGapBuildMojo {
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     getLog().debug("Authenticating.");
-    WebResource webResource = meManager.createRootWebResource(username, password);
+    WebResource webResource = getRootWebResource();
 
     getLog().info("Requesting summary from cloud.");
     MeResponse me = meManager.requestMe(webResource);
@@ -66,25 +41,4 @@ public class ScorchMojo extends AbstractMojo {
     }
 
   }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public void setAppsManager(AppsManager appsManager) {
-    this.appsManager = appsManager;
-  }
-
-  public void setMeManager(MeManager meManager) {
-    this.meManager = meManager;
-  }
-
-  public void setKeysManager(KeysManager keysManager) {
-    this.keysManager = keysManager;
-  }
-
 }

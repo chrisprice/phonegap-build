@@ -2,7 +2,6 @@ package com.github.chrisprice.phonegapbuild.plugin;
 
 import java.io.File;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -10,12 +9,6 @@ import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
-import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
-import com.github.chrisprice.phonegapbuild.api.managers.AppsManagerImpl;
-import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
-import com.github.chrisprice.phonegapbuild.api.managers.KeysManagerImpl;
-import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
-import com.github.chrisprice.phonegapbuild.api.managers.MeManagerImpl;
 import com.github.chrisprice.phonegapbuild.plugin.utils.FileResourceIdStore;
 import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
@@ -26,22 +19,7 @@ import com.sun.jersey.api.client.WebResource;
  * @goal clean
  * @phase pre-clean
  */
-public class CleanMojo extends AbstractMojo {
-
-  /**
-   * PhoneGap Build username
-   * 
-   * @parameter expression="${phonegap-build.username}"
-   */
-  private String username;
-
-  /**
-   * PhoneGap Build password
-   * 
-   * @parameter expression="${phonegap-build.password}"
-   */
-  private String password;
-
+public class CleanMojo extends AbstractPhoneGapBuildMojo {
   /**
    * Working directory.
    * 
@@ -50,16 +28,13 @@ public class CleanMojo extends AbstractMojo {
    */
   private File workingDirectory;
 
-  private AppsManager appsManager = new AppsManagerImpl();
-  private MeManager meManager = new MeManagerImpl();
-  private KeysManager keysManager = new KeysManagerImpl();
   private ResourceIdStore<App> appIdStore = new FileResourceIdStore<App>();
   private ResourceIdStore<Key> keyIdStore = new FileResourceIdStore<Key>();
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     getLog().debug("Authenticating.");
 
-    WebResource webResource = meManager.createRootWebResource(username, password);
+    WebResource webResource = getRootWebResource();
 
     getLog().debug("Requesting summary from cloud.");
 
@@ -88,28 +63,8 @@ public class CleanMojo extends AbstractMojo {
     }
   }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
   public void setWorkingDirectory(File workingDirectory) {
     this.workingDirectory = workingDirectory;
-  }
-
-  public void setAppsManager(AppsManager appsManager) {
-    this.appsManager = appsManager;
-  }
-
-  public void setMeManager(MeManager meManager) {
-    this.meManager = meManager;
-  }
-
-  public void setKeysManager(KeysManager keysManager) {
-    this.keysManager = keysManager;
   }
 
   public void setAppIdStore(ResourceIdStore<App> appIdStore) {

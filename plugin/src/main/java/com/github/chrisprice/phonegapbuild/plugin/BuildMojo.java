@@ -3,7 +3,6 @@ package com.github.chrisprice.phonegapbuild.plugin;
 import java.io.File;
 import java.util.Arrays;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -22,12 +21,6 @@ import com.github.chrisprice.phonegapbuild.api.data.me.MeResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
-import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
-import com.github.chrisprice.phonegapbuild.api.managers.AppsManagerImpl;
-import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
-import com.github.chrisprice.phonegapbuild.api.managers.KeysManagerImpl;
-import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
-import com.github.chrisprice.phonegapbuild.api.managers.MeManagerImpl;
 import com.github.chrisprice.phonegapbuild.plugin.utils.AppDownloader;
 import com.github.chrisprice.phonegapbuild.plugin.utils.AppUploadPackager;
 import com.github.chrisprice.phonegapbuild.plugin.utils.FetchKeys;
@@ -47,7 +40,7 @@ import com.sun.jersey.api.client.WebResource;
  * @phase package
  * @requiresDependencyResolution compile
  */
-public class BuildMojo extends AbstractMojo {
+public class BuildMojo extends AbstractPhoneGapBuildMojo {
 
   /**
    * The Zip archiver.
@@ -74,20 +67,6 @@ public class BuildMojo extends AbstractMojo {
    * @readonly
    */
   private MavenProject project;
-
-  /**
-   * PhoneGap Build username
-   * 
-   * @parameter expression="${phonegap-build.username}"
-   */
-  private String username;
-
-  /**
-   * PhoneGap Build password
-   * 
-   * @parameter expression="${phonegap-build.password}"
-   */
-  private String password;
 
   /**
    * Configuration file.
@@ -173,9 +152,6 @@ public class BuildMojo extends AbstractMojo {
    */
   private String[] platforms = new String[] {"android", "blackberry", "ios", "symbian", "webos", "winphone"};
 
-  private AppsManager appsManager = new AppsManagerImpl();
-  private MeManager meManager = new MeManagerImpl();
-  private KeysManager keysManager = new KeysManagerImpl();
   private FetchKeys fetchKeys = new FetchKeysImpl();
   private ResourceIdStore<App> appIdStore = new FileResourceIdStore<App>();
   private ResourceIdStore<Key> keyIdStore = new FileResourceIdStore<Key>();
@@ -196,7 +172,7 @@ public class BuildMojo extends AbstractMojo {
     File appSource = appUploadPackager.createUploadPackage();
 
     getLog().debug("Authenticating.");
-    WebResource webResource = meManager.createRootWebResource(username, password);
+    WebResource webResource = getRootWebResource();
 
     getLog().debug("Requesting summary from cloud.");
     MeResponse me = meManager.requestMe(webResource);
@@ -354,20 +330,8 @@ public class BuildMojo extends AbstractMojo {
     this.warExcludes = excludes;
   }
 
-  public void setAppsManager(AppsManager appsManager) {
-    this.appsManager = appsManager;
-  }
-
   public void setZipUnArchiver(ZipUnArchiver zipUnArchiver) {
     this.zipUnArchiver = zipUnArchiver;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
   }
 
   public void setiOsCertificate(File iOsCertificate) {
@@ -384,14 +348,6 @@ public class BuildMojo extends AbstractMojo {
 
   public void setKeys(String keys) {
     this.keys = keys;
-  }
-
-  public void setMeManager(MeManager meManager) {
-    this.meManager = meManager;
-  }
-
-  public void setKeysManager(KeysManager keysManager) {
-    this.keysManager = keysManager;
   }
 
   public void setPlatforms(String[] platforms) {

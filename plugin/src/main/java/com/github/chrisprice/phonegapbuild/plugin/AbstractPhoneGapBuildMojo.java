@@ -1,6 +1,7 @@
 package com.github.chrisprice.phonegapbuild.plugin;
 
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
@@ -17,7 +18,7 @@ import com.sun.jersey.api.client.WebResource;
  * @author cprice
  * 
  */
-public abstract class AbstractPhoneGapBuildMojo {
+public abstract class AbstractPhoneGapBuildMojo extends AbstractMojo {
 
   /**
    * @component role="org.apache.maven.artifact.manager.WagonManager"
@@ -27,9 +28,27 @@ public abstract class AbstractPhoneGapBuildMojo {
   protected WagonManager wagonManager;
 
   /**
+   * The id of the server to pull the credentials from (takes precedent over username/password).
+   * 
    * @parameter expression="${phonegap-build.server}"
    */
   private String server;
+
+  /**
+   * PhoneGap Build username. Deprecated, use server instead.
+   * 
+   * @deprecated
+   * @parameter expression="${phonegap-build.username}"
+   */
+  private String username;
+
+  /**
+   * PhoneGap Build password. Deprecated, use server instead.
+   * 
+   * @deprecated
+   * @parameter expression="${phonegap-build.password}"
+   */
+  private String password;
 
   protected AppsManager appsManager = new AppsManagerImpl();
   protected KeysManager keysManager = new KeysManagerImpl();
@@ -39,8 +58,31 @@ public abstract class AbstractPhoneGapBuildMojo {
 
   protected WebResource getRootWebResource() {
     if (rootWebResource == null) {
-      AuthenticationInfo info = wagonManager.getAuthenticationInfo(server);
-      rootWebResource = meManager.createRootWebResource(info.getUserName(), info.getPassword());
+      String username, password;
+      if (server != null) {
+        AuthenticationInfo info = wagonManager.getAuthenticationInfo(server);
+        if (info == null) {
+          throw new RuntimeException("Server not found in settings.xml " + server + ".");
+        }
+        username = info.getUserName();
+        if (username == null) {
+          throw new RuntimeException("No username found for server " + server + ".");
+        }
+        password = info.getPassword();
+        if (password == null) {
+          throw new RuntimeException("No password found for server " + server + ".");
+        }
+      } else {
+        getLog().warn("Server not specified, falling back to username/password.");
+        if (this.username == null || this.password == null) {
+          throw new RuntimeException("Username/password not specified (" + this.username + ", "
+              + this.password + ").");
+        }
+        username = this.username;
+        password = this.password;
+      }
+
+      rootWebResource = meManager.createRootWebResource(username, password);
     }
     return rootWebResource;
   }
@@ -67,6 +109,14 @@ public abstract class AbstractPhoneGapBuildMojo {
 
   public void setRootWebResource(WebResource rootWebResource) {
     this.rootWebResource = rootWebResource;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 
 }

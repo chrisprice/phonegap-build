@@ -1,16 +1,19 @@
 package com.github.chrisprice.phonegapbuild.api.data.apps;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 public class AppDetailsRequest {
+  @JsonSerialize(include = Inclusion.NON_NULL)
   public static class Keys {
-    private int ios;
+    private Integer ios;
 
-    public int getIos() {
+    public Integer getIos() {
       return ios;
     }
 
-    public void setIos(int ios) {
+    public void setIos(Integer ios) {
       this.ios = ios;
     }
 

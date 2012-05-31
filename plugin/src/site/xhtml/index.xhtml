@@ -74,8 +74,28 @@
 	<p>
 		To use the PhoneGap Build service you need to <a
 			href="https://build.phonegap.com/people/sign_up">sign up for an
-			account</a> and then configure the plugin with your credentials. The
-		plugin expects your username and password to be specified as <a
+			account</a> and then configure the plugin with your credentials. There
+		are three different ways to do this. Since 0.0.2, the recommended way
+		is to configure a server in your settings.xml (<a
+			href="http://maven.apache.org/settings.html#Servers">detailed
+			instructions</a>) -
+	</p>
+	<pre>&lt;server&gt;
+	&lt;id&gt;ID&lt;/id&gt;
+	&lt;username&gt;USERNAME&lt;/username&gt;
+	&lt;password&gt;PASSWORD&lt;/password&gt; 
+&lt;/server&gt;</pre>
+	<p>
+		Then configure a <a
+			href="http://maven.apache.org/examples/injecting-properties-via-settings.html">property
+			in your settings.xml</a> with the id of the server (this id can also be
+		set in the POM as a property or configuration parameter)-
+	</p>
+	<pre>&lt;properties&gt;
+	&lt;phonegap-build.server&gt;ID&lt;/phonegap-build.server&gt;
+&lt;/properties&gt;</pre>
+	<p>
+		Alternatively, they can be specified as <a
 			href="http://maven.apache.org/examples/injecting-properties-via-settings.html">properties
 			in your setttings.xml</a> -
 	</p>
@@ -86,14 +106,6 @@
 
 	<p>Or on the command line as properties -</p>
 	<pre>mvn clean install -Dphonegap-build.username=USERNAME -Dphonegap-build.password=PASSWORD</pre>
-
-	<p>
-		<i>There is currently a bug raised <a
-			href="https://github.com/chrisprice/phonegap-build/issues/2">#2</a>
-			relating to changing over to use the standard maven technique of
-			servers to configure credentials.
-		</i>
-	</p>
 
 	<p>N.B. The plugin will not work until you have supplied a
 		configuration file.</p>
@@ -208,6 +220,23 @@
 	<pre>&lt;configuration&gt;
 	&lt;keys&gt;com.github.chrisprice:certificates&lt;/keys&gt;
 &lt;/configuration&gt;</pre>
+
+	<p>Since 0.0.2, if you wish to keep both the certificate and certificate
+		password private then you can use a server in your settings.xml to
+		store these values -</p>
+
+	<pre>&lt;server&gt;
+	&lt;id&gt;IOS_SERVER_ID&lt;/id&gt;
+	&lt;privateKey&gt;CERTIFICATE&lt;/privateKey&gt;
+	&lt;passphrase&gt;CERTIFICATE_PASSWORD&lt;/passphrase&gt; 
+&lt;/server&gt;</pre>
+
+	<p>Following the same pattern as authentication, you must configure
+		the plugin with the server id (this id can also be set in the POM as a
+		property or configuration parameter)-</p>
+	<pre>&lt;properties&gt;
+	&lt;phonegap-build.ios.server&gt;IOS_SERVER_ID&lt;/phonegap-build.ios.server&gt;
+&lt;/properties&gt;</pre>
 
 	<h3>Scorch</h3>
 

@@ -61,6 +61,20 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
   private File workingDirectory;
 
   /**
+   * App id (used in preference to creating a new app)
+   * 
+   * @parameter
+   */
+  private Integer appId;
+
+  /**
+   * iOS key id (used in preference to uploading an ios key)
+   * 
+   * @parameter
+   */
+  private Integer iOsKeyId;
+
+  /**
    * iOS certificate server id (used in preference to iOsCertificate*)
    * 
    * @parameter expression="${phonegap-build.ios.server}"
@@ -184,6 +198,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     getLog().debug("Checking for existing app.");
     appIdStore.setAlias("app");
     appIdStore.setWorkingDirectory(workingDirectory);
+    appIdStore.setIdOverride(this.appId);
     HasResourceIdAndPath<App> appSummary = appIdStore.load(me.getApps().getAll());
 
     if (appSummary == null) {
@@ -236,6 +251,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     getLog().debug("Checking for existing ios key.");
     keyIdStore.setAlias("ios-key");
     keyIdStore.setWorkingDirectory(workingDirectory);
+    keyIdStore.setIdOverride(iOsKeyId);
     HasResourceIdAndPath<Key> iOsKey = keyIdStore.load(keyResources);
 
     if (iOsKey != null) {

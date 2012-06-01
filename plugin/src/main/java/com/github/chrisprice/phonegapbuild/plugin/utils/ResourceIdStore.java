@@ -18,4 +18,6 @@ public interface ResourceIdStore<T extends AbstractResource> {
 
   public void setWorkingDirectory(File workingDirectory);
 
+  public void setIdOverride(Integer overrideId);
+
 }

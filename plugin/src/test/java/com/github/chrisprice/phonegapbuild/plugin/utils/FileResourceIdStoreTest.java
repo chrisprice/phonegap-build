@@ -42,8 +42,25 @@ public class FileResourceIdStoreTest extends TestCase {
     assertNull(fileResourceIdStore.load(getEmptyAppList()));
   }
 
+  public void testOverrideIdNoAssociatedId() throws IOException, MojoExecutionException {
+    try {
+      fileResourceIdStore.setIdOverride(10);
+      assertNull(fileResourceIdStore.load(getEmptyAppList()));
+      fail("Should have thrown");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().startsWith("Override id 10 specified but not found"));
+    }
+  }
+
+  public void testOverrideIdPositive() throws IOException, MojoExecutionException {
+    final int id = 10;
+    fileResourceIdStore.setIdOverride(id);
+    HasResourceIdAndPath<App> resourceIdAndPath = fileResourceIdStore.load(getAppListContainingId(id));
+    assertEquals(id, resourceIdAndPath.getResourceId().getId());
+  }
+
   public void testAppAlreadyExistsPositive() throws IOException, MojoExecutionException {
-    int id = 10;
+    final int id = 10;
     createFileContainingId(id);
     MeAppResponse[] resources = getAppListContainingId(id);
     HasResourceIdAndPath<App> resourceIdAndPath = fileResourceIdStore.load(resources);

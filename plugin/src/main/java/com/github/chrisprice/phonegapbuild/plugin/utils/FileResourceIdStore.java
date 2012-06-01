@@ -13,25 +13,34 @@ import com.github.chrisprice.phonegapbuild.api.data.resources.AbstractResource;
 @Component(role = ResourceIdStore.class, hint = "file")
 public class FileResourceIdStore<T extends AbstractResource> implements ResourceIdStore<T> {
   private String alias;
-
   private File workingDirectory;
+  private Integer overrideId;
 
   public HasResourceIdAndPath<T> load(HasResourceIdAndPath<T>[] remoteResources) {
-    File file = getFile();
-    try {
-      if (!file.exists()) {
-        return null;
-      }
-      int resourceId = Integer.parseInt(FileUtils.readFileToString(file));
-      for (HasResourceIdAndPath<T> resource : remoteResources) {
-        if (resource.getResourceId().getId() == resourceId) {
-          return resource;
+    int resourceId;
+    if (overrideId == null) {
+      File file = getFile();
+      try {
+        if (!file.exists()) {
+          return null;
         }
+        resourceId = Integer.parseInt(FileUtils.readFileToString(file));
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to read stored resource id for " + alias + ", from file "
+            + file.getAbsolutePath(), e);
       }
-      return null;
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to read stored resource id", e);
+    } else {
+      resourceId = overrideId;
     }
+    for (HasResourceIdAndPath<T> resource : remoteResources) {
+      if (resource.getResourceId().getId() == resourceId) {
+        return resource;
+      }
+    }
+    if (overrideId != null) {
+      throw new RuntimeException("Override id " + overrideId + " specified but not found for " + alias);
+    }
+    return null;
   }
 
   public void save(ResourceId<T> resourceId) {
@@ -45,7 +54,7 @@ public class FileResourceIdStore<T extends AbstractResource> implements Resource
     try {
       FileUtils.writeStringToFile(file, Integer.toString(resourceId.getId()));
     } catch (IOException e) {
-      throw new RuntimeException("Failed to store app id", e);
+      throw new RuntimeException("Failed to store app id for " + alias + ", to file " + file.getAbsolutePath(), e);
     }
   }
 
@@ -63,5 +72,10 @@ public class FileResourceIdStore<T extends AbstractResource> implements Resource
 
   public void setWorkingDirectory(File workingDirectory) {
     this.workingDirectory = workingDirectory;
+  }
+
+  @Override
+  public void setIdOverride(Integer overrideId) {
+    this.overrideId = overrideId;
   }
 }

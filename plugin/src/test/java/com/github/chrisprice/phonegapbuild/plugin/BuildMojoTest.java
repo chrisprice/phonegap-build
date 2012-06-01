@@ -75,6 +75,7 @@ public class BuildMojoTest extends MockObjectTestCase {
     }
     checking(new Expectations() {
       {
+        oneOf(resourceIdStore).setIdOverride(null);
         oneOf(resourceIdStore).setAlias("ios-key");
         oneOf(resourceIdStore).setWorkingDirectory(workingDirectory);
         oneOf(resourceIdStore).load(keys);
@@ -104,6 +105,7 @@ public class BuildMojoTest extends MockObjectTestCase {
     final ResourceIdStore<Key> resourceIdStore = mock(ResourceIdStore.class);
     checking(new Expectations() {
       {
+        oneOf(resourceIdStore).setIdOverride(null);
         oneOf(resourceIdStore).setAlias("ios-key");
         oneOf(resourceIdStore).setWorkingDirectory(workingDirectory);
         oneOf(resourceIdStore).load(keys);

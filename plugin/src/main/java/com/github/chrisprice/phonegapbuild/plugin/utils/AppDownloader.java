@@ -7,14 +7,12 @@ import org.apache.maven.project.MavenProject;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
-import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
 import com.sun.jersey.api.client.WebResource;
 
 public interface AppDownloader {
 
-  public void downloadArtifacts(WebResource webResource, ResourcePath<App> appResourcePath, Platform... platforms);
-
-  public void setAppsManager(AppsManager appsManager);
+  public void downloadArtifacts(WebResource webResource, ResourcePath<App> appResourcePath,
+      Platform... platforms);
 
   public void setWorkingDirectory(File workingDirectory);
 

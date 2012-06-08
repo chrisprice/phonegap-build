@@ -16,27 +16,25 @@ import com.sun.jersey.api.client.WebResource;
 
 @Component(role = AppDownloader.class)
 public class AppDownloaderImpl implements AppDownloader {
-  
+
   @Requirement
   private MavenProjectHelper mavenProjectHelper;
+  @Requirement
+  private AppsManager appsManager;
 
   private MavenProject project;
-  private AppsManager appsManager;
   private File workingDirectory;
 
   @Override
-  public void downloadArtifacts(WebResource webResource, ResourcePath<App> appResourcePath, Platform... platforms) {
+  public void downloadArtifacts(WebResource webResource, ResourcePath<App> appResourcePath,
+      Platform... platforms) {
     for (Platform platform : platforms) {
       // download the app
       File app = appsManager.downloadApp(webResource, appResourcePath, platform, workingDirectory);
       // attach it to the project with the appropriate classifier (platform) and type (extension)
-      mavenProjectHelper.attachArtifact(project, FilenameUtils.getExtension(app.getName()), platform.getValue(), app);
+      mavenProjectHelper.attachArtifact(project, FilenameUtils.getExtension(app.getName()),
+          platform.getValue(), app);
     }
-  }
-
-  @Override
-  public void setAppsManager(AppsManager appsManager) {
-    this.appsManager = appsManager;
   }
 
   public void setMavenProjectHelper(MavenProjectHelper mavenProjectHelper) {

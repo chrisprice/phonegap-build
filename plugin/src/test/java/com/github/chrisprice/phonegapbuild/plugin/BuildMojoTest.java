@@ -17,6 +17,7 @@ import com.github.chrisprice.phonegapbuild.api.data.me.MeKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
+import com.github.chrisprice.phonegapbuild.plugin.utils.IOsKeyManager;
 import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
 
@@ -31,10 +32,13 @@ public class BuildMojoTest extends MockObjectTestCase {
   private String iOsCertificatePassword;
   private String appTitle;
   private ResourceId<Key> iOsKeyResourceId;
+  private IOsKeyManager iOsKeyManager;
 
   @Override
   protected void setUp() throws Exception {
     buildMojo = new BuildMojo();
+    iOsKeyManager = new IOsKeyManager();
+    buildMojo.setiOsKeyManager(iOsKeyManager);
 
     workingDirectory = File.createTempFile("temp", Long.toString(System.nanoTime()));
     assertTrue(workingDirectory.delete());
@@ -56,7 +60,8 @@ public class BuildMojoTest extends MockObjectTestCase {
     iOsKeyResourceId = new ResourceId<Key>(123);
   }
 
-  public void testEnsureIOsKeyStored_NoKeyStored() throws MojoExecutionException, MojoFailureException, IOException {
+  public void testEnsureIOsKeyStored_NoKeyStored() throws MojoExecutionException,
+      MojoFailureException, IOException {
     final WebResource webResource = mock(WebResource.class);
     @SuppressWarnings("unchecked")
     final ResourcePath<PlatformKeys> platformKeysResourcePath = mock(ResourcePath.class);
@@ -80,19 +85,21 @@ public class BuildMojoTest extends MockObjectTestCase {
         oneOf(resourceIdStore).setWorkingDirectory(workingDirectory);
         oneOf(resourceIdStore).load(keys);
         will(returnValue(null));
-        oneOf(keysManager).postNewKey(webResource, platformKeysResourcePath, expectedIOsKeyRequest, iOsCertificate,
-            iOsMobileProvision);
+        oneOf(keysManager).postNewKey(webResource, platformKeysResourcePath, expectedIOsKeyRequest,
+            iOsCertificate, iOsMobileProvision);
         will(returnValue(iOsKeyResponse));
         oneOf(resourceIdStore).save(iOsKeyResourceId);
       }
     });
-    buildMojo.setKeyIdStore(resourceIdStore);
-    buildMojo.setKeysManager(keysManager);
-    ResourceId<Key> actualIOsKeyResourceId = buildMojo.ensureIOsKey(webResource, platformKeysResourcePath, keys);
+    iOsKeyManager.setKeyIdStore(resourceIdStore);
+    iOsKeyManager.setKeysManager(keysManager);
+    ResourceId<Key> actualIOsKeyResourceId =
+        buildMojo.ensureIOsKey(webResource, platformKeysResourcePath, keys);
     assertEquals(actualIOsKeyResourceId, actualIOsKeyResourceId);
   }
 
-  public void testEnsureIOsKeyStored_KeyStored() throws MojoExecutionException, MojoFailureException, IOException {
+  public void testEnsureIOsKeyStored_KeyStored() throws MojoExecutionException,
+      MojoFailureException, IOException {
     final WebResource webResource = mock(WebResource.class);
     @SuppressWarnings("unchecked")
     final ResourcePath<PlatformKeys> platformKeysResourcePath = mock(ResourcePath.class);
@@ -112,8 +119,9 @@ public class BuildMojoTest extends MockObjectTestCase {
         will(returnValue(key));
       }
     });
-    buildMojo.setKeyIdStore(resourceIdStore);
-    ResourceId<Key> actualIOsKeyResourceId = buildMojo.ensureIOsKey(webResource, platformKeysResourcePath, keys);
+    iOsKeyManager.setKeyIdStore(resourceIdStore);
+    ResourceId<Key> actualIOsKeyResourceId =
+        buildMojo.ensureIOsKey(webResource, platformKeysResourcePath, keys);
     assertEquals(actualIOsKeyResourceId, actualIOsKeyResourceId);
   }
 

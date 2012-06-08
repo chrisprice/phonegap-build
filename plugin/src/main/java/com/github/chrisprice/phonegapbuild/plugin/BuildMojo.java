@@ -20,7 +20,7 @@ import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.plugin.utils.AppDownloader;
 import com.github.chrisprice.phonegapbuild.plugin.utils.AppUploadPackager;
-import com.github.chrisprice.phonegapbuild.plugin.utils.KeyManager;
+import com.github.chrisprice.phonegapbuild.plugin.utils.IOsKeyManager;
 import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
 
@@ -170,7 +170,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
   /**
    * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.KeyManager" hint="ios"
    */
-  private KeyManager iOsKeyManager;
+  private IOsKeyManager iOsKeyManager;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     ensureWorkingDirectory();
@@ -325,7 +325,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     this.appIdStore = appIdStore;
   }
 
-  public void setiOsKeyManager(KeyManager iOsKeyManager) {
+  public void setiOsKeyManager(IOsKeyManager iOsKeyManager) {
     this.iOsKeyManager = iOsKeyManager;
   }
 

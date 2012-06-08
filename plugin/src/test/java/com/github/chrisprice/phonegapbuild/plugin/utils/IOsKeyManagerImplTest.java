@@ -20,7 +20,7 @@ import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.sun.jersey.api.client.WebResource;
 
-public class IOsKeyManagerTest extends MockObjectTestCase {
+public class IOsKeyManagerImplTest extends MockObjectTestCase {
   {
     setImposteriser(ClassImposteriser.INSTANCE);
   }
@@ -30,11 +30,11 @@ public class IOsKeyManagerTest extends MockObjectTestCase {
   private String iOsCertificatePassword;
   private String appTitle;
   private ResourceId<Key> iOsKeyResourceId;
-  private IOsKeyManager iOsKeyManager;
+  private IOsKeyManagerImpl iOsKeyManager;
 
   @Override
   protected void setUp() throws Exception {
-    iOsKeyManager = new IOsKeyManager();
+    iOsKeyManager = new IOsKeyManagerImpl();
 
     workingDirectory = File.createTempFile("temp", Long.toString(System.nanoTime()));
     assertTrue(workingDirectory.delete());

@@ -20,67 +20,54 @@ import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.sun.jersey.api.client.WebResource;
 
-@Component(role = AppDownloader.class, hint = "ios")
-public class IOsKeyManager {
+@Component(role = KeyManager.class, hint = "ios")
+public class IOsKeyManager implements KeyManager {
 
   @Requirement
   private ResourceIdStore<Key> keyIdStore;
-
   @Requirement
   private FetchKeys fetchKeys;
+  @Requirement
+  private WagonManager wagonManager;
+  private KeysManager keysManager;
+  private Log log;
 
   /**
    * iOS key id (used in preference to uploading an ios key)
-   * 
-   * @parameter
    */
   private Integer iOsKeyId;
 
   /**
    * iOS certificate server id (used in preference to iOsCertificate*)
-   * 
-   * @parameter expression="${phonegap-build.ios.server}"
    */
   private String iOsServer;
 
   /**
    * iOS p12 certificate. Deprecated - use iOsServer instead.
-   * 
-   * @parameter expression="${project.build.directory}/phonegap-build/ios.p12"
-   * @deprecated
    */
   private File iOsCertificate;
 
   /**
    * iOS certificate password. Deprecated - use iOsServer instead.
-   * 
-   * @parameter expression="${phonegap-build.ios.certificate.password}"
-   * @deprecated
    */
   private String iOsCertificatePassword;
 
   /**
    * iOS mobileprovision file
-   * 
-   * @parameter expression="${project.build.directory}/phonegap-build/ios.mobileprovision"
    */
   private File iOsMobileProvision;
 
   /**
    * A comma delimited string of artifact co-ordinates used to filter the dependencies list for key
    * packages. The co-ordinates should be of the form groupId:artifactId.
-   * 
-   * @parameter
    */
   private String keys;
 
   private MavenProject project;
-  private KeysManager keysManager;
   private File workingDirectory;
   private String appTitle;
-  private WagonManager wagonManager;
-  private Log log;
 
+  @Override
   public ResourceId<Key> ensureIOsKey(WebResource webResource,
       ResourcePath<PlatformKeys> keysResource, HasResourceIdAndPath<Key>[] keyResources)
       throws MojoExecutionException, MojoFailureException {
@@ -160,11 +147,12 @@ public class IOsKeyManager {
     return iOsKeyRequest;
   }
 
+  @Override
   public void setLog(Log log) {
     this.log = log;
   }
 
-  public Log getLog() {
+  private Log getLog() {
     return log;
   }
 
@@ -176,30 +164,37 @@ public class IOsKeyManager {
     this.fetchKeys = fetchKeys;
   }
 
+  @Override
   public void setiOsKeyId(Integer iOsKeyId) {
     this.iOsKeyId = iOsKeyId;
   }
 
+  @Override
   public void setiOsServer(String iOsServer) {
     this.iOsServer = iOsServer;
   }
 
+  @Override
   public void setiOsCertificate(File iOsCertificate) {
     this.iOsCertificate = iOsCertificate;
   }
 
+  @Override
   public void setiOsCertificatePassword(String iOsCertificatePassword) {
     this.iOsCertificatePassword = iOsCertificatePassword;
   }
 
+  @Override
   public void setiOsMobileProvision(File iOsMobileProvision) {
     this.iOsMobileProvision = iOsMobileProvision;
   }
 
+  @Override
   public void setKeys(String keys) {
     this.keys = keys;
   }
 
+  @Override
   public void setProject(MavenProject project) {
     this.project = project;
   }
@@ -208,10 +203,12 @@ public class IOsKeyManager {
     this.keysManager = keysManager;
   }
 
+  @Override
   public void setWorkingDirectory(File workingDirectory) {
     this.workingDirectory = workingDirectory;
   }
 
+  @Override
   public void setAppTitle(String appTitle) {
     this.appTitle = appTitle;
   }

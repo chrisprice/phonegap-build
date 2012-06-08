@@ -10,12 +10,12 @@
 	<name>PhoneGap Build Sample</name>
  
 	<dependencies>
-		<dependency>
+<!-- 		<dependency>
 			<groupId>com.scottlogic.mobile</groupId>
 			<artifactId>certificates</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<type>zip</type>
-		</dependency>
+		</dependency> -->
 	</dependencies>
  
 
@@ -24,7 +24,7 @@
 			<plugin>
 				<groupId>com.github.chrisprice</groupId>
 				<artifactId>phonegap-build-maven-plugin</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
+				<version>0.0.2-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>phonegap-build</id>
@@ -33,10 +33,11 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<keys>com.scottlogic.mobile:certificates</keys>
+							<!-- <keys>com.scottlogic.mobile:certificates</keys> -->
+							<server>phonegap-build</server>
 							<platforms>
 								<platform>android</platform>
-								<platform>ios</platform>
+								<!-- <platform>ios</platform> -->
 							</platforms>
 						</configuration>
 					</execution>

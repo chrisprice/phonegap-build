@@ -20,7 +20,7 @@ import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.plugin.utils.AppDownloader;
 import com.github.chrisprice.phonegapbuild.plugin.utils.AppUploadPackager;
-import com.github.chrisprice.phonegapbuild.plugin.utils.IOsKeyManager;
+import com.github.chrisprice.phonegapbuild.plugin.utils.KeyManager;
 import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
 
@@ -168,9 +168,9 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
   private AppDownloader appDownloader;
 
   /**
-   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.IOsKeyManager"
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.KeyManager" hint="ios"
    */
-  private IOsKeyManager iOsKeyManager;
+  private KeyManager iOsKeyManager;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     ensureWorkingDirectory();
@@ -228,8 +228,9 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
         .get(platforms));
   }
 
-  ResourceId<Key> ensureIOsKey(WebResource webResource, ResourcePath<PlatformKeys> resourcePath,
-      MeKeyResponse[] all) throws MojoExecutionException, MojoFailureException {
+  private ResourceId<Key> ensureIOsKey(WebResource webResource,
+      ResourcePath<PlatformKeys> resourcePath, MeKeyResponse[] all) throws MojoExecutionException,
+      MojoFailureException {
     iOsKeyManager.setAppTitle(appTitle);
     iOsKeyManager.setKeys(keys);
     iOsKeyManager.setiOsCertificate(iOsCertificate);
@@ -239,7 +240,6 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     iOsKeyManager.setiOsServer(iOsServer);
     iOsKeyManager.setLog(getLog());
     iOsKeyManager.setProject(project);
-    iOsKeyManager.setWagonManager(wagonManager);
     iOsKeyManager.setWorkingDirectory(workingDirectory);
     return iOsKeyManager.ensureIOsKey(webResource, resourcePath, all);
   }
@@ -326,7 +326,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     this.appIdStore = appIdStore;
   }
 
-  public void setiOsKeyManager(IOsKeyManager iOsKeyManager) {
+  public void setiOsKeyManager(KeyManager iOsKeyManager) {
     this.iOsKeyManager = iOsKeyManager;
   }
 

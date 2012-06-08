@@ -5,11 +5,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
-import com.github.chrisprice.phonegapbuild.api.managers.AppsManagerImpl;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
-import com.github.chrisprice.phonegapbuild.api.managers.KeysManagerImpl;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
-import com.github.chrisprice.phonegapbuild.api.managers.MeManagerImpl;
 import com.sun.jersey.api.client.WebResource;
 
 /**
@@ -26,6 +23,27 @@ public abstract class AbstractPhoneGapBuildMojo extends AbstractMojo {
    * @readonly
    */
   protected WagonManager wagonManager;
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.api.managers.AppsManager"
+   * @required
+   * @readonly
+   */
+  protected AppsManager appsManager;
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.api.managers.KeysManager"
+   * @required
+   * @readonly
+   */
+  protected KeysManager keysManager;
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.api.managers.MeManager"
+   * @required
+   * @readonly
+   */
+  protected MeManager meManager;
 
   /**
    * The id of the server to pull the credentials from (takes precedent over username/password).
@@ -49,10 +67,6 @@ public abstract class AbstractPhoneGapBuildMojo extends AbstractMojo {
    * @parameter expression="${phonegap-build.password}"
    */
   private String password;
-
-  protected AppsManager appsManager = new AppsManagerImpl();
-  protected KeysManager keysManager = new KeysManagerImpl();
-  protected MeManager meManager = new MeManagerImpl();
 
   private WebResource rootWebResource;
 

@@ -1,0 +1,16 @@
+<component-set>
+  <components>
+    <component>
+      <role>com.github.chrisprice.phonegapbuild.api.managers.AppsManager</role>
+      <implementation>com.github.chrisprice.phonegapbuild.api.managers.AppsManagerImpl</implementation>
+    </component>
+    <component>
+      <role>com.github.chrisprice.phonegapbuild.api.managers.KeysManager</role>
+      <implementation>com.github.chrisprice.phonegapbuild.api.managers.KeysManagerImpl</implementation>
+    </component>
+    <component>
+      <role>com.github.chrisprice.phonegapbuild.api.managers.MeManager</role>
+      <implementation>com.github.chrisprice.phonegapbuild.api.managers.MeManagerImpl</implementation>
+    </component>
+  </components>
+</component-set>

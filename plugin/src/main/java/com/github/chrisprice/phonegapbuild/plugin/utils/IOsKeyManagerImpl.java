@@ -20,7 +20,7 @@ import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.sun.jersey.api.client.WebResource;
 
-@Component(role = IOsKeyManager.class, hint = "ios")
+@Component(role = IOsKeyManager.class)
 public class IOsKeyManagerImpl implements IOsKeyManager {
 
   @Requirement

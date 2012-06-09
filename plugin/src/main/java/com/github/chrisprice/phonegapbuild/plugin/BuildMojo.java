@@ -168,7 +168,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
   private AppDownloader appDownloader;
 
   /**
-   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.KeyManager" hint="ios"
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.IOsKeyManager"
    */
   private IOsKeyManager iOsKeyManager;
 

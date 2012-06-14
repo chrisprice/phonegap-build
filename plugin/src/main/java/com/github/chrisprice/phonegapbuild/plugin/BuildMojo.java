@@ -105,6 +105,13 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
   private File iOsMobileProvision;
 
   /**
+   * Enable android signing.
+   * 
+   * @parameter default-value="false"
+   */
+  private boolean androidSign;
+
+  /**
    * Android key id (used in preference to uploading an android key)
    * 
    * @parameter
@@ -258,8 +265,8 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
         computedIOsKeyId = ensureIOsKey(webResource, iosKeys.getResourcePath(), iosKeys.getAll());
       }
 
-      getLog().debug("Ensuring android key exists if it is a target platform.");
-      if (targetPlatformsContains(Platform.ANDROID)) {
+      getLog().debug("Ensuring android key exists if it is a target platform and Android signing is enabled.");
+      if (targetPlatformsContains(Platform.ANDROID) && androidSign) {
         MePlatformResponse androidKeys = me.getKeys().getAndroid();
         computedAndroidKeyId = ensureAndroidKey(webResource, androidKeys.getResourcePath(), androidKeys.getAll());
       }

@@ -81,6 +81,7 @@ public class IOsKeyManagerImpl implements IOsKeyManager {
       return iOsKey.getResourceId();
     }
 
+    // this should be handled by BuildMojo (it's global across all key management)
     if (keys != null) {
       getLog().debug("Fetching keys dependencies");
       fetchKeys.setIncludes(keys);

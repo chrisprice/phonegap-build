@@ -8,6 +8,7 @@ public class AppDetailsRequest {
   @JsonSerialize(include = Inclusion.NON_NULL)
   public static class Keys {
     private Integer ios;
+    private Integer android;
 
     public Integer getIos() {
       return ios;
@@ -15,6 +16,14 @@ public class AppDetailsRequest {
 
     public void setIos(Integer ios) {
       this.ios = ios;
+    }
+
+    public Integer getAndroid() {
+      return android;
+    }
+
+    public void setAndroid(Integer android) {
+      this.android = android;
     }
 
   }

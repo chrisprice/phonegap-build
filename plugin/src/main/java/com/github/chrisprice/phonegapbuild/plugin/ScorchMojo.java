@@ -32,13 +32,20 @@ public class ScorchMojo extends AbstractPhoneGapBuildMojo {
       appsManager.deleteApp(webResource, app.getResourcePath());
     }
 
-    HasResourceIdAndPath<Key>[] keys = me.getKeys().getIos().getAll();
+    HasResourceIdAndPath<Key>[] iosKeys = me.getKeys().getIos().getAll();
+    getLog().info("Found " + iosKeys.length + " ios keys, starting delete.");
+    deleteKeys(webResource, iosKeys);
 
-    getLog().info("Found " + keys.length + " keys, starting delete.");
-    for (HasResourceIdAndPath<Key> key : keys) {
+    HasResourceIdAndPath<Key>[] androidKeys = me.getKeys().getAndroid().getAll();
+    getLog().info("Found " + androidKeys.length + " android keys, starting delete.");
+    deleteKeys(webResource, androidKeys);
+
+  }
+
+  private void deleteKeys(WebResource webResource, HasResourceIdAndPath<Key>[] androidKeys) {
+    for (HasResourceIdAndPath<Key> key : androidKeys) {
       getLog().info("Deleting cloud key id " + key.getResourceId());
       keysManager.deleteKey(webResource, key.getResourcePath());
     }
-
   }
 }

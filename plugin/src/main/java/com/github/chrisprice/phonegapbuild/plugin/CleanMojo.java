@@ -64,7 +64,7 @@ public class CleanMojo extends AbstractPhoneGapBuildMojo {
     HasResourceIdAndPath<Key> iOsKey = keyIdStore.load(me.getKeys().getIos().getAll());
 
     if (iOsKey != null) {
-      getLog().info("Deleting cloud key id " + iOsKey.getResourceId());
+      getLog().info("Deleting cloud ios key id " + iOsKey.getResourceId());
       keysManager.deleteKey(webResource, iOsKey.getResourcePath());
     }
 
@@ -75,7 +75,7 @@ public class CleanMojo extends AbstractPhoneGapBuildMojo {
     HasResourceIdAndPath<Key> androidKey = keyIdStore.load(me.getKeys().getAndroid().getAll());
 
     if (androidKey != null) {
-      getLog().info("Deleting cloud key id " + androidKey.getResourceId());
+      getLog().info("Deleting cloud android key id " + androidKey.getResourceId());
       keysManager.deleteKey(webResource, androidKey.getResourcePath());
     }
   }

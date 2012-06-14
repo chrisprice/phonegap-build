@@ -29,7 +29,9 @@ public class IOsKeyManagerImpl implements IOsKeyManager {
   private FetchKeys fetchKeys;
   @Requirement
   private WagonManager wagonManager;
+  @Requirement
   private KeysManager keysManager;
+
   private Log log;
 
   /**

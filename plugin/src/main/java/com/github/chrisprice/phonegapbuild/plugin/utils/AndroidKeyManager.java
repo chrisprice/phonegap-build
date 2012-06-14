@@ -10,7 +10,6 @@ import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
-import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.sun.jersey.api.client.WebResource;
 
 public interface AndroidKeyManager {
@@ -35,7 +34,5 @@ public interface AndroidKeyManager {
   public void setWorkingDirectory(File workingDirectory);
 
   public void setAppTitle(String appTitle);
-
-  public void setKeysManager(KeysManager keysManager);
 
 }

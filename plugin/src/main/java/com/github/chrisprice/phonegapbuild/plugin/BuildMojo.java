@@ -295,7 +295,6 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     androidKeyManager.setAndroidKeystorePassword(androidKeystorePassword);
     androidKeyManager.setAndroidServer(androidServer);
     androidKeyManager.setAppTitle(appTitle);
-    androidKeyManager.setKeysManager(keysManager);
     androidKeyManager.setLog(getLog());
     androidKeyManager.setWorkingDirectory(workingDirectory);
     return androidKeyManager.ensureAndroidKey(webResource, resourcePath, all);

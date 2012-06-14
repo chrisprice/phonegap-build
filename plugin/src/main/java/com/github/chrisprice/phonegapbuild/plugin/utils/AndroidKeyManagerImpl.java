@@ -57,7 +57,9 @@ public class AndroidKeyManagerImpl implements AndroidKeyManager {
   @Requirement
   private ResourceIdStore<Key> keyIdStore;
 
+  @Requirement
   private KeysManager keysManager;
+
   private Log log;
   private File workingDirectory;
   private String appTitle;
@@ -202,7 +204,6 @@ public class AndroidKeyManagerImpl implements AndroidKeyManager {
     this.appTitle = appTitle;
   }
 
-  @Override
   public void setKeysManager(KeysManager keysManager) {
     this.keysManager = keysManager;
   }

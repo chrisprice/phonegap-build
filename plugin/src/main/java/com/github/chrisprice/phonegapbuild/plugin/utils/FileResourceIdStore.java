@@ -10,7 +10,7 @@ import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.resources.AbstractResource;
 
-@Component(role = ResourceIdStore.class, hint = "file")
+@Component(role = ResourceIdStore.class, hint = "file", instantiationStrategy = "per-lookup")
 public class FileResourceIdStore<T extends AbstractResource> implements ResourceIdStore<T> {
   private String alias;
   private File workingDirectory;

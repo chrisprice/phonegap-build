@@ -1,6 +1,9 @@
 package com.github.chrisprice.phonegapbuild.api.data.apps;
 
-public class AppErrorResponse {
+import com.github.chrisprice.phonegapbuild.api.data.HasAllPlatforms;
+import com.github.chrisprice.phonegapbuild.api.data.Platform;
+
+public class AppErrorResponse implements HasAllPlatforms<String> {
   private String android;
   private String blackberry;
   private String ios;
@@ -54,6 +57,11 @@ public class AppErrorResponse {
 
   public void setWinphone(String winphone) {
     this.winphone = winphone;
+  }
+
+  @Override
+  public String get(Platform platform) {
+    return platform.get(this);
   }
 
 }

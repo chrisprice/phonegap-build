@@ -15,6 +15,7 @@ public class AppResponse implements HasResourceIdAndPath<App> {
   private String version;
   private AppStatusResponse status;
   private AppDownloadResponse download;
+  private AppErrorResponse error;
   private AppKeysResponse keys;
   private String repo;
   @JsonProperty("id")
@@ -85,6 +86,14 @@ public class AppResponse implements HasResourceIdAndPath<App> {
 
   public void setKeys(AppKeysResponse keys) {
     this.keys = keys;
+  }
+
+  public AppErrorResponse getError() {
+    return error;
+  }
+
+  public void setError(AppErrorResponse error) {
+    this.error = error;
   }
 
 }

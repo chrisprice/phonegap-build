@@ -114,8 +114,7 @@ public class AppsManagerImpl implements AppsManager {
             }
             break;
           case ERROR:
-            // TODO: show error
-            throw new ApiException("Build error : " + "(error)");
+            throw new ApiException("Build error : " + app.getError().get(platform));
           case NULL:
             throw new ApiException("This platform requires a key and no key has been defined.");
           default:

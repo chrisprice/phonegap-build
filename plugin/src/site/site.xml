@@ -9,8 +9,9 @@
 		</menu>
 		<menu name="Overview">
 			<item name="Introduction" href="index.html" />
+			<item name="Signing for iOS" href="signing-for-ios.html" />
+			<item name="Signing for Android" href="signing-for-android.html" />
 			<item name="Goals" href="plugin-info.html" />
-			<!-- <item name="Usage" href="usage.html" /> -->
 			<item name="JavaDoc" href="apidocs/index.html" />
 		</menu>
 		<menu name="Examples">

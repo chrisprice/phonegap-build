@@ -13,7 +13,7 @@ import com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore;
 import com.sun.jersey.api.client.WebResource;
 
 /**
- * Delete the cloud app instance if a stored app id can be found.
+ * Delete the cloud app and keys if found.
  * 
  * @goal clean
  * @phase pre-clean

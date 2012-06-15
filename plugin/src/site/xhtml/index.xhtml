@@ -176,6 +176,25 @@
 	&lt;/platforms&gt;
 &lt;/configuration&gt;</pre>
 
+	<h3>Updating an Existing App/Using Existing Keys</h3>
+	<p>Whilst the plugin currently supports managing the full process
+		it can be useful to manage apps/keys manually for e.g. sharing them
+		with collaborators or making more advanced use of the service. The
+		following configuration properties can be used to specify app and key
+		ids -</p>
+
+	<pre>&lt;configuration&gt;
+	&lt;appId&gt;12345&lt;/appId&gt;
+	&lt;iOsKeyId&gt;23456&lt;/iOsKeyId&gt;
+	&lt;androidKeyId&gt;23456&lt;/androidKeyId&gt;
+&lt;/configuration&gt;</pre>
+
+	<p>These ids will override any other app or key configuration and
+		will not be deleted by the clean goal.</p>
+
+	<p>If you are unsure of how to get an id for a particular app or
+		key, then the list goal might help (see below).</p>
+
 	<h3>Utility Goals (list/scorch)</h3>
 
 	<p>When the plugin is configured correctly it should take care of

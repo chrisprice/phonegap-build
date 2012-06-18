@@ -86,6 +86,16 @@
 						</configuration>
 					</plugin>
 					<plugin>
+						<artifactId>maven-release-plugin</artifactId>
+						<configuration>
+							<!-- 
+								Don't do a deploy site-deploy because it breaks for github,
+								instead use the site-maven-plugin below. 
+							-->
+							<goals>deploy</goals>
+						</configuration>
+					</plugin>
+					<plugin>
 						<groupId>com.github.github</groupId>
 						<artifactId>site-maven-plugin</artifactId>
 						<version>0.6</version>

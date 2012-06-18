@@ -48,9 +48,6 @@
 	<profiles>
 		<profile>
 			<id>release</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 			<build>
 				<plugins>
 					<plugin>
@@ -93,6 +90,7 @@
 								instead use the site-maven-plugin below. 
 							-->
 							<goals>deploy</goals>
+							<releaseProfiles>release</releaseProfiles>
 						</configuration>
 					</plugin>
 					<plugin>

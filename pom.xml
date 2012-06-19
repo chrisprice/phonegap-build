@@ -86,10 +86,10 @@
 						<artifactId>maven-release-plugin</artifactId>
 						<configuration>
 							<!-- 
-								Don't do a deploy site-deploy because it breaks for github,
-								instead use the site-maven-plugin below. 
+								Don't do a "deploy site-deploy" because it breaks for github,
+								instead use "deploy site" and the site-maven-plugin below. 
 							-->
-							<goals>deploy</goals>
+							<goals>deploy site</goals>
 							<releaseProfiles>release</releaseProfiles>
 						</configuration>
 					</plugin>

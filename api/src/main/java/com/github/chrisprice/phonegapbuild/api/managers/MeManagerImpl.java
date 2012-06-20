@@ -20,15 +20,19 @@ public class MeManagerImpl implements MeManager {
 
   private static final String TOKEN_PARAM = "auth_token";
 
-  /* (non-Javadoc)
-   * @see com.github.chrisprice.phonegapbuild.api.managers.MeManager#createRootWebResource(java.lang.String, java.lang.String)
-   */
   @Override
   public WebResource createRootWebResource(String username, String password) {
+    return createRootWebResource(username, password, null);
+  }
+
+  @Override
+  public WebResource createRootWebResource(String username, String password, String proxyUri) {
     // create a DefaultApacheHttpClientConfig (instead of just a ClientConfig)
     DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
-    // configure it to use the fiddler proxy
-    // config.getProperties().put(DefaultApacheHttpClientConfig.PROPERTY_PROXY_URI, "http://127.0.0.1:8888");
+    // configure it to use a proxy
+    if (proxyUri != null) {
+      config.getProperties().put(DefaultApacheHttpClientConfig.PROPERTY_PROXY_URI, proxyUri);
+    }
     // configure it to parse JSON to POJOs
     config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
     // configure to follow re-directs (used for downloading packages)

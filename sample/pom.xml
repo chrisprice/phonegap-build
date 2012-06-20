@@ -24,7 +24,7 @@
 			<plugin>
 				<groupId>com.github.chrisprice</groupId>
 				<artifactId>phonegap-build-maven-plugin</artifactId>
-				<version>0.0.2-SNAPSHOT</version>
+				<version>0.0.3-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>phonegap-build</id>

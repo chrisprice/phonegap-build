@@ -4,6 +4,7 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
+import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
 
@@ -109,6 +110,7 @@ public class AbstractPhoneGapBuildMojoTest extends MockObjectTestCase {
             setPassword("pass");
           }
         }));
+        oneOf(wagonManager).getProxy("http");
         oneOf(meManager).createRootWebResource("user", "pass");
       }
     });
@@ -140,7 +142,31 @@ public class AbstractPhoneGapBuildMojoTest extends MockObjectTestCase {
     mojo.setPassword("pass");
     checking(new Expectations() {
       {
+        oneOf(wagonManager).getProxy("http");
         oneOf(meManager).createRootWebResource("user", "pass");
+      }
+    });
+    assertEquals(null, mojo.getRootWebResource());
+  }
+
+  @SuppressWarnings("serial")
+  public void testGetRootWebResource_proxySpecifiedPositive() {
+    mojo.setUsername("user");
+    mojo.setPassword("pass");
+    checking(new Expectations() {
+      {
+        oneOf(wagonManager).getProxy("http");
+        will(returnValue(new ProxyInfo() {
+          public String getHost() {
+            return "localhost";
+          }
+
+          public int getPort() {
+            return 8888;
+          }
+
+        }));
+        oneOf(meManager).createRootWebResource("user", "pass", "http://localhost:8888");
       }
     });
     assertEquals(null, mojo.getRootWebResource());
@@ -160,9 +186,11 @@ public class AbstractPhoneGapBuildMojoTest extends MockObjectTestCase {
             setPassword("passServer");
           }
         }));
+        oneOf(wagonManager).getProxy("http");
         oneOf(meManager).createRootWebResource("userServer", "passServer");
       }
     });
     assertEquals(null, mojo.getRootWebResource());
   }
 }
+

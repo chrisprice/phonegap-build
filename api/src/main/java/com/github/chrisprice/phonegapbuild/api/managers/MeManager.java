@@ -10,6 +10,8 @@ public interface MeManager {
 
   public WebResource createRootWebResource(String username, String password);
 
+  public WebResource createRootWebResource(String username, String password, String proxyUri);
+
   public MeResponse requestMe(WebResource resource);
 
 }

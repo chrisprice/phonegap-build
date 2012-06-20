@@ -1,9 +1,14 @@
 package com.github.chrisprice.phonegapbuild.plugin;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
+import org.apache.maven.wagon.proxy.ProxyInfo;
 
+import com.github.chrisprice.phonegapbuild.api.ApiException;
 import com.github.chrisprice.phonegapbuild.api.managers.AppsManager;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import com.github.chrisprice.phonegapbuild.api.managers.MeManager;
@@ -95,8 +100,17 @@ public abstract class AbstractPhoneGapBuildMojo extends AbstractMojo {
         username = this.username;
         password = this.password;
       }
-
-      rootWebResource = meManager.createRootWebResource(username, password);
+      ProxyInfo proxyInfo = wagonManager.getProxy("http");
+      if (proxyInfo != null) {
+        try {
+          URI uri = new URI("http", null, proxyInfo.getHost(), proxyInfo.getPort(), null, null, null);
+          rootWebResource = meManager.createRootWebResource(username, password, uri.toString());
+        } catch (URISyntaxException e) {
+          throw new ApiException("Could not load http proxy settings", e);
+        }
+      } else {
+        rootWebResource = meManager.createRootWebResource(username, password);
+      }
     }
     return rootWebResource;
   }

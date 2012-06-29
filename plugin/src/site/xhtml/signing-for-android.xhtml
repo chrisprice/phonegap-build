@@ -54,12 +54,12 @@
 &lt;/properties&gt;</pre>
 
 
-	<p><b>Additionally you must also explicitly tell the plugin to sign
-		the artifact</b> (by default the Android development certificate is used)
-		-</p>
-	<pre>&lt;properties&gt;
-	&lt;phonegap-build.android.sign&gt;true&lt;/phonegap-build.android.sign&gt;
-&lt;/properties&gt;</pre>
+	<p>
+		<b>Additionally you must also explicitly tell the configure the
+			plugin in the project's POM to sign the artifact</b> (by default the
+		Android development certificate is used) -
+	</p>
+	<pre>&lt;androidSign&gt;true&lt;/androidSign&gt;</pre>
 
 	<p>It is possible to configure the above using properties but it is
 		not recommended.</p>

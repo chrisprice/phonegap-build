@@ -82,17 +82,16 @@
 							</reportPlugins>
 						</configuration>
 					</plugin>
-					<plugin>
-						<artifactId>maven-release-plugin</artifactId>
-						<configuration>
-							<!-- 
-								Don't do a "deploy site-deploy" because it breaks for github,
-								instead use "deploy site" and the site-maven-plugin below. 
-							-->
-							<goals>deploy site</goals>
-							<releaseProfiles>release</releaseProfiles>
-						</configuration>
-					</plugin>
+        			<plugin>
+        				<artifactId>maven-release-plugin</artifactId>
+        				<configuration>
+        					<!-- 
+        						Don't do a "deploy site-deploy" because it breaks for github,
+        						instead use "deploy site" and the site-maven-plugin below. 
+        					-->
+        					<goals>deploy site</goals>
+        				</configuration>
+        			</plugin>
 					<plugin>
 						<groupId>com.github.github</groupId>
 						<artifactId>site-maven-plugin</artifactId>
@@ -123,6 +122,12 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<releaseProfiles>release</releaseProfiles>
 				</configuration>
 			</plugin>
 		</plugins>

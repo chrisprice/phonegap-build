@@ -40,6 +40,10 @@
 		</developer>
 	</developers>
 
+	<properties>
+		<currentStableVersion>0.0.3</currentStableVersion>
+	</properties>
+
 	<modules>
 		<module>api</module>
 		<module>plugin</module>

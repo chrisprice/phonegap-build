@@ -1,6 +1,7 @@
 package com.github.chrisprice.phonegapbuild.api.managers;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
@@ -16,6 +17,7 @@ import com.github.chrisprice.phonegapbuild.api.data.apps.AppsResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.App;
 import com.github.chrisprice.phonegapbuild.api.data.resources.AppDownload;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Apps;
+import com.google.common.io.Files;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.multipart.FormDataBodyPart;
@@ -129,9 +131,11 @@ public class AppsManagerImpl implements AppsManager {
           throw new ApiException("Could not delete previously downloaded file " + targetFile.getAbsolutePath() + ".");
         }
       }
-      if (!tempFile.renameTo(targetFile)) {
+      try {
+        Files.move(tempFile, targetFile);
+      } catch (IOException e) {
         throw new ApiException("Could not move/rename downloaded file to " + targetFile.getAbsolutePath()
-            + ". It may still be available at " + tempFile.getAbsolutePath() + ".");
+            + ". It may still be available at " + tempFile.getAbsolutePath() + ".", e);
       }
       return targetFile;
     } catch (UniformInterfaceException e) {

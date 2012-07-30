@@ -207,6 +207,16 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
       "android", "blackberry", "ios", "symbian", "webos", "winphone"};
 
   /**
+   * Whether to auto clean the cloud copy after building, if true this ensures that even if the
+   * build fails the cloud copy is removed.
+   * 
+   * Defaults to true.
+   * 
+   * @parameter expression="${phonegap-build.autoClean}" default-value="true"
+   */
+  private boolean autoClean;
+
+  /**
    * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore"
    */
   private ResourceIdStore<App> appIdStore;
@@ -230,6 +240,11 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
    * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.AndroidKeyManager"
    */
   private AndroidKeyManager androidKeyManager;
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.plugin.CleanMojo"
+   */
+  private CleanMojo cleanMojo;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     ensureWorkingDirectory();
@@ -255,42 +270,53 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     appIdStore.setIdOverride(this.appId);
     HasResourceIdAndPath<App> appSummary = appIdStore.load(me.getApps().getAll());
 
-    if (appSummary == null) {
-      ResourceId<Key> computedIOsKeyId = null;
-      ResourceId<Key> computedAndroidKeyId = null;
-
-      getLog().debug("Ensuring ios key exists if it is a target platform.");
-      if (targetPlatformsContains(Platform.IOS)) {
-        MePlatformResponse iosKeys = me.getKeys().getIos();
-        computedIOsKeyId = ensureIOsKey(webResource, iosKeys.getResourcePath(), iosKeys.getAll());
+    try {
+      if (appSummary == null) {
+        appSummary = createApp(webResource, me, appSource);
+      } else {
+        getLog().info("Starting upload to existing app id " + appSummary.getResourceId());
+        appsManager.putApp(webResource, appSummary.getResourcePath(), null, appSource);
       }
 
-      getLog().debug("Ensuring android key exists if it is a target platform and Android signing is enabled.");
-      if (targetPlatformsContains(Platform.ANDROID) && androidSign) {
-        MePlatformResponse androidKeys = me.getKeys().getAndroid();
-        computedAndroidKeyId = ensureAndroidKey(webResource, androidKeys.getResourcePath(), androidKeys.getAll());
+      getLog().info("Starting downloads.");
+      appDownloader.setProject(project);
+      appDownloader.setWorkingDirectory(workingDirectory);
+      appDownloader.downloadArtifacts(webResource, appSummary.getResourcePath(), Platform.get(platforms));
+    } finally {
+      if (autoClean) {
+        cleanMojo.execute();
       }
+    }
+  }
 
-      getLog().debug("Building upload request.");
-      AppDetailsRequest appDetailsRequest = createAppDetailsRequest(computedIOsKeyId, computedAndroidKeyId);
+  private HasResourceIdAndPath<App> createApp(WebResource webResource, MeResponse me, File appSource)
+      throws MojoExecutionException, MojoFailureException {
+    HasResourceIdAndPath<App> appSummary;
+    ResourceId<Key> computedIOsKeyId = null;
+    ResourceId<Key> computedAndroidKeyId = null;
 
-      getLog().info("Starting upload.");
-      appSummary =
-          appsManager.postNewApp(webResource, me.getApps().getResourcePath(), appDetailsRequest,
-              appSource);
-
-      getLog().info("Storing new app id " + appSummary.getResourceId());
-      appIdStore.save(appSummary.getResourceId());
-    } else {
-      getLog().info("Starting upload to existing app id " + appSummary.getResourceId());
-      appsManager.putApp(webResource, appSummary.getResourcePath(), null, appSource);
+    getLog().debug("Ensuring ios key exists if it is a target platform.");
+    if (targetPlatformsContains(Platform.IOS)) {
+      MePlatformResponse iosKeys = me.getKeys().getIos();
+      computedIOsKeyId = ensureIOsKey(webResource, iosKeys.getResourcePath(), iosKeys.getAll());
     }
 
-    getLog().info("Starting downloads.");
-    appDownloader.setProject(project);
-    appDownloader.setWorkingDirectory(workingDirectory);
-    appDownloader.downloadArtifacts(webResource, appSummary.getResourcePath(), Platform
-        .get(platforms));
+    getLog().debug("Ensuring android key exists if it is a target platform and Android signing is enabled.");
+    if (targetPlatformsContains(Platform.ANDROID) && androidSign) {
+      MePlatformResponse androidKeys = me.getKeys().getAndroid();
+      computedAndroidKeyId = ensureAndroidKey(webResource, androidKeys.getResourcePath(), androidKeys.getAll());
+    }
+
+    getLog().debug("Building upload request.");
+    AppDetailsRequest appDetailsRequest = createAppDetailsRequest(computedIOsKeyId, computedAndroidKeyId);
+
+    getLog().info("Starting upload.");
+    appSummary = appsManager.postNewApp(webResource, me.getApps().getResourcePath(), appDetailsRequest,
+            appSource);
+
+    getLog().info("Storing new app id " + appSummary.getResourceId());
+    appIdStore.save(appSummary.getResourceId());
+    return appSummary;
   }
 
   private ResourceId<Key> ensureAndroidKey(WebResource webResource, ResourcePath<PlatformKeys> resourcePath,
@@ -410,6 +436,10 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
 
   public void setiOsKeyManager(IOsKeyManager iOsKeyManager) {
     this.iOsKeyManager = iOsKeyManager;
+  }
+
+  void setCleanMojo(CleanMojo cleanMojo) {
+    this.cleanMojo = cleanMojo;
   }
 
 }

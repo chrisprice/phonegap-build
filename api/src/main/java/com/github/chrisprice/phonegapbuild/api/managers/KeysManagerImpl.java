@@ -20,7 +20,6 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 
-// TODO: properly support keys for all platforms, this is currently a bit of a hack to make iOS work
 public class KeysManagerImpl implements KeysManager {
   @Override
   public SuccessResponse deleteKey(WebResource resource, ResourcePath<Key> keyResourcePath) {

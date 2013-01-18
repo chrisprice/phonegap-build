@@ -16,6 +16,8 @@ public class IOsKeyResponse implements HasResourceIdAndPath<Key> {
   @JsonProperty("cert_name")
   private String certificateName;
   private String provision;
+  private boolean locked;
+  private String role;
   @JsonProperty("link")
   private ResourcePath<Key> resourcePath;
 
@@ -67,6 +69,22 @@ public class IOsKeyResponse implements HasResourceIdAndPath<Key> {
 
   public void setResourcePath(ResourcePath<Key> resourcePath) {
     this.resourcePath = resourcePath;
+  }
+
+  public boolean isLocked() {
+    return locked;
+  }
+
+  public void setLocked(boolean locked) {
+    this.locked = locked;
+  }
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
   }
 
 }

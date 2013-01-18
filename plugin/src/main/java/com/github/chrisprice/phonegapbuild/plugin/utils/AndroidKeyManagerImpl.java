@@ -13,6 +13,7 @@ import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.keys.AndroidKeyRequest;
+import com.github.chrisprice.phonegapbuild.api.data.keys.AndroidKeyUnlockRequest;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
@@ -74,10 +75,6 @@ public class AndroidKeyManagerImpl implements AndroidKeyManager {
     keyIdStore.setIdOverride(androidKeyId);
     HasResourceIdAndPath<Key> key = keyIdStore.load(keyResources);
 
-    if (key != null) {
-      return key.getResourceId();
-    }
-
     File androidKeystore;
     String androidKeystorePassword;
     String androidCertificatePassword;
@@ -130,6 +127,16 @@ public class AndroidKeyManagerImpl implements AndroidKeyManager {
 
     if (androidCertificateAlias == null || androidCertificateAlias.isEmpty()) {
       throw new MojoFailureException("androidAlias not defined or blank.");
+    }
+
+    if (key != null) {
+      getLog().debug("Unlocking existing android key.");
+      AndroidKeyUnlockRequest androidKeyUnlockRequest = new AndroidKeyUnlockRequest();
+      androidKeyUnlockRequest.setKeyPassword(androidCertificatePassword);
+      androidKeyUnlockRequest.setKeyStorePassword(androidKeystorePassword);
+      keysManager.unlockKey(webResource, key.getResourcePath(), androidKeyUnlockRequest);
+      getLog().debug("Key unlocked.");
+      return key.getResourceId();
     }
 
     getLog().debug("Building android key upload request.");

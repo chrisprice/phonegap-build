@@ -270,9 +270,24 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     appIdStore.setIdOverride(this.appId);
     HasResourceIdAndPath<App> appSummary = appIdStore.load(me.getApps().getAll());
 
+    ResourceId<Key> computedIOsKeyId = null;
+    ResourceId<Key> computedAndroidKeyId = null;
+
+    getLog().debug("Ensuring ios key exists if it is a target platform.");
+    if (targetPlatformsContains(Platform.IOS)) {
+      MePlatformResponse iosKeys = me.getKeys().getIos();
+      computedIOsKeyId = ensureIOsKey(webResource, iosKeys.getResourcePath(), iosKeys.getAll());
+    }
+
+    getLog().debug("Ensuring android key exists if it is a target platform and Android signing is enabled.");
+    if (targetPlatformsContains(Platform.ANDROID) && androidSign) {
+      MePlatformResponse androidKeys = me.getKeys().getAndroid();
+      computedAndroidKeyId = ensureAndroidKey(webResource, androidKeys.getResourcePath(), androidKeys.getAll());
+    }
+
     try {
       if (appSummary == null) {
-        appSummary = createApp(webResource, me, appSource);
+        appSummary = createApp(webResource, me, appSource, computedIOsKeyId, computedAndroidKeyId);
       } else {
         getLog().info("Starting upload to existing app id " + appSummary.getResourceId());
         appsManager.putApp(webResource, appSummary.getResourcePath(), null, appSource);
@@ -289,23 +304,10 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     }
   }
 
-  private HasResourceIdAndPath<App> createApp(WebResource webResource, MeResponse me, File appSource)
+  private HasResourceIdAndPath<App> createApp(WebResource webResource, MeResponse me, File appSource,
+      ResourceId<Key> computedIOsKeyId, ResourceId<Key> computedAndroidKeyId)
       throws MojoExecutionException, MojoFailureException {
     HasResourceIdAndPath<App> appSummary;
-    ResourceId<Key> computedIOsKeyId = null;
-    ResourceId<Key> computedAndroidKeyId = null;
-
-    getLog().debug("Ensuring ios key exists if it is a target platform.");
-    if (targetPlatformsContains(Platform.IOS)) {
-      MePlatformResponse iosKeys = me.getKeys().getIos();
-      computedIOsKeyId = ensureIOsKey(webResource, iosKeys.getResourcePath(), iosKeys.getAll());
-    }
-
-    getLog().debug("Ensuring android key exists if it is a target platform and Android signing is enabled.");
-    if (targetPlatformsContains(Platform.ANDROID) && androidSign) {
-      MePlatformResponse androidKeys = me.getKeys().getAndroid();
-      computedAndroidKeyId = ensureAndroidKey(webResource, androidKeys.getResourcePath(), androidKeys.getAll());
-    }
 
     getLog().debug("Building upload request.");
     AppDetailsRequest appDetailsRequest = createAppDetailsRequest(computedIOsKeyId, computedAndroidKeyId);

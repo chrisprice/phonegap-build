@@ -14,6 +14,7 @@ public class AndroidKeyResponse implements HasResourceIdAndPath<Key> {
   @JsonProperty("default")
   private boolean defaultKey;
   private String alias;
+  private boolean locked;
   @JsonProperty("link")
   private ResourcePath<Key> resourcePath;
 
@@ -57,5 +58,13 @@ public class AndroidKeyResponse implements HasResourceIdAndPath<Key> {
 
   public void setResourcePath(ResourcePath<Key> resourcePath) {
     this.resourcePath = resourcePath;
+  }
+
+  public boolean isLocked() {
+    return locked;
+  }
+
+  public void setLocked(boolean locked) {
+    this.locked = locked;
   }
 }

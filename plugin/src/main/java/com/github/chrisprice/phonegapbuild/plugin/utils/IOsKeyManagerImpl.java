@@ -15,6 +15,7 @@ import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyRequest;
+import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyUnlockRequest;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
 import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
@@ -79,10 +80,6 @@ public class IOsKeyManagerImpl implements IOsKeyManager {
     keyIdStore.setIdOverride(iOsKeyId);
     HasResourceIdAndPath<Key> iOsKey = keyIdStore.load(keyResources);
 
-    if (iOsKey != null) {
-      return iOsKey.getResourceId();
-    }
-
     // this should be handled by BuildMojo (it's global across all key management)
     if (keys != null) {
       getLog().debug("Fetching keys dependencies");
@@ -127,6 +124,15 @@ public class IOsKeyManagerImpl implements IOsKeyManager {
     if (iOsMobileProvision == null || !iOsMobileProvision.exists()) {
       String path = iOsMobileProvision == null ? null : iOsMobileProvision.getAbsolutePath();
       throw new MojoFailureException("ios mobileprovision does not exist " + path + ".");
+    }
+
+    if (iOsKey != null) {
+      getLog().debug("Unlocking existing ios key.");
+      IOsKeyUnlockRequest iOsKeyUnlockRequest = new IOsKeyUnlockRequest();
+      iOsKeyUnlockRequest.setPassword(iOsCertificatePassword);
+      keysManager.unlockKey(webResource, iOsKey.getResourcePath(), iOsKeyUnlockRequest);
+      getLog().debug("Key unlocked.");
+      return iOsKey.getResourceId();
     }
 
     getLog().debug("Building iOS key upload request.");

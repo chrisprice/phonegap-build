@@ -14,6 +14,7 @@ import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyRequest;
 import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyResponse;
+import com.github.chrisprice.phonegapbuild.api.data.keys.IOsKeyUnlockRequest;
 import com.github.chrisprice.phonegapbuild.api.data.me.MeKeyResponse;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Key;
 import com.github.chrisprice.phonegapbuild.api.data.resources.PlatformKeys;
@@ -107,13 +108,25 @@ public class IOsKeyManagerImplTest extends MockObjectTestCase {
     final WebResource webResource = mock(WebResource.class);
     @SuppressWarnings("unchecked")
     final ResourcePath<PlatformKeys> platformKeysResourcePath = mock(ResourcePath.class);
+    @SuppressWarnings("unchecked")
+    final ResourcePath<Key> keyResourcePath = mock(ResourcePath.class, "key");
     final MeKeyResponse key = new MeKeyResponse();
     {
       key.setResourceId(iOsKeyResourceId);
+      key.setResourcePath(keyResourcePath);
     }
     final MeKeyResponse[] keys = new MeKeyResponse[] {key};
     @SuppressWarnings("unchecked")
     final ResourceIdStore<Key> resourceIdStore = mock(ResourceIdStore.class);
+    final KeysManager keysManager = mock(KeysManager.class);
+    final IOsKeyUnlockRequest expectedIOsKeyUnlockRequest = new IOsKeyUnlockRequest();
+    {
+      expectedIOsKeyUnlockRequest.setPassword(iOsCertificatePassword);
+    }
+    final IOsKeyResponse iOsKeyResponse = new IOsKeyResponse();
+    {
+      iOsKeyResponse.setResourceId(iOsKeyResourceId);
+    }
     checking(new Expectations() {
       {
         oneOf(resourceIdStore).setIdOverride(null);
@@ -121,9 +134,12 @@ public class IOsKeyManagerImplTest extends MockObjectTestCase {
         oneOf(resourceIdStore).setWorkingDirectory(workingDirectory);
         oneOf(resourceIdStore).load(keys);
         will(returnValue(key));
+        oneOf(keysManager).unlockKey(webResource, keyResourcePath, expectedIOsKeyUnlockRequest);
+        will(returnValue(iOsKeyResponse));
       }
     });
     iOsKeyManager.setKeyIdStore(resourceIdStore);
+    iOsKeyManager.setKeysManager(keysManager);
     ResourceId<Key> actualIOsKeyResourceId =
         iOsKeyManager.ensureIOsKey(webResource, platformKeysResourcePath, keys);
     assertEquals(actualIOsKeyResourceId, actualIOsKeyResourceId);

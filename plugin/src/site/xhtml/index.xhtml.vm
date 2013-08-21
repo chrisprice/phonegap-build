@@ -144,6 +144,34 @@
 	&lt;/executions&gt;
 &lt;/plugin&gt;</pre>
 
+
+
+  <h3>PhoneGap zip intermediate File</h3>
+
+    <p>
+      PhoneGap zip your code in an intermediate file.
+      You can change the intermediate file path.
+    </p>    
+
+    <pre>&lt;plugin&gt;
+    &lt;groupId&gt;com.github.chrisprice&lt;/groupId&gt;
+    &lt;artifactId&gt;phonegap-build-maven-plugin&lt;/artifactId&gt;
+    &lt;version&gt;${currentStableVersion}&lt;/version&gt; 
+    &lt;executions&gt;
+      &lt;execution&gt;
+        &lt;id&gt;phonegap-build&lt;/id&gt;
+        &lt;goals&gt;
+          &lt;goal&gt;clean&lt;/goal&gt;
+          &lt;goal&gt;build&lt;/goal&gt;
+        &lt;/goals&gt;
+        &lt;configuration&gt;
+          &lt;zipFile&gt;${project.build.finalName}.zip&lt;/zipFile&gt;
+        &lt;/configuration&gt;
+      &lt;/execution&gt;
+    &lt;/executions&gt;
+  &lt;/plugin&gt;</pre>
+
+
 	<h3>Platform Support</h3>
 	<p>The plugin currently supports building for the following
 		platforms -</p>

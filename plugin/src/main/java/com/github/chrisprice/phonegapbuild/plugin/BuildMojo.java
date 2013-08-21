@@ -51,6 +51,13 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
    * @parameter expression="${basedir}/src/main/phonegap-build/config.xml"
    */
   private File configFile;
+  
+  /**
+   * Zip file.
+   * 
+   * @parameter expression="${project.build.finalName}.zip"
+   */
+  private String zipFile;
 
   /**
    * Working directory.
@@ -241,6 +248,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     appUploadPackager.setWarExcludes(warExcludes);
     appUploadPackager.setWarIncludes(warIncludes);
     appUploadPackager.setWorkingDirectory(workingDirectory);
+    appUploadPackager.setZipFile(zipFile);
     File appSource = appUploadPackager.createUploadPackage();
 
     getLog().debug("Authenticating.");
@@ -369,6 +377,10 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
 
   public void setConfigFile(File configFile) {
     this.configFile = configFile;
+  }
+  
+   public void setZipFile(String zipFile) {
+    this.zipFile = zipFile;
   }
 
   public void setWorkingDirectory(File workingDirectory) {

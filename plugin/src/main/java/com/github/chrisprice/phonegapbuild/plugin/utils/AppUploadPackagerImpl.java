@@ -20,10 +20,11 @@ public class AppUploadPackagerImpl implements AppUploadPackager {
   private String[] warIncludes;
   private String[] warExcludes;
   private File configFile;
+  private String zipFile;
 
   @Override
   public File createUploadPackage() {
-    File file = new File(workingDirectory, "file.zip");
+    File file = new File(workingDirectory, zipFile);
     if (file.exists()) {
       if (!file.delete()) {
         throw new RuntimeException("Could not delete existing upload package at " + file.getAbsolutePath() + ".");
@@ -71,5 +72,10 @@ public class AppUploadPackagerImpl implements AppUploadPackager {
   public void setConfigFile(File configFile) {
     this.configFile = configFile;
   }
+
+@Override
+public void setZipFile(String zipFile) {
+    this.zipFile = zipFile;
+}
 
 }

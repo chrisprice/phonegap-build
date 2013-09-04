@@ -16,6 +16,6 @@ public interface AppUploadPackager {
 
   public void setConfigFile(File configFile);
 
-public void setZipFile(String zipFile);
+  public void setZipFile(String zipFile);
 
 }

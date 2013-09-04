@@ -51,7 +51,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
    * @parameter expression="${basedir}/src/main/phonegap-build/config.xml"
    */
   private File configFile;
-  
+
   /**
    * Zip file.
    * 

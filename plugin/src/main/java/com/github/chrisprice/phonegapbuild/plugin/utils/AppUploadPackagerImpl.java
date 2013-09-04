@@ -73,9 +73,9 @@ public class AppUploadPackagerImpl implements AppUploadPackager {
     this.configFile = configFile;
   }
 
-@Override
-public void setZipFile(String zipFile) {
+  @Override
+  public void setZipFile(String zipFile) {
     this.zipFile = zipFile;
-}
+  }
 
 }

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.chrisprice</groupId>
 		<artifactId>phonegap-build</artifactId>
-		<version>0.0.5</version>
+		<version>0.0.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>phonegap-build-api</artifactId>

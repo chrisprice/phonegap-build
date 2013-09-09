@@ -14,19 +14,22 @@ import com.sun.jersey.api.client.WebResource;
 
 public interface AppsManager {
 
-  public AppsResponse getApps(WebResource resource, ResourcePath<Apps> appsResponsePath);
+  AppsResponse getApps(WebResource resource, ResourcePath<Apps> appsResponsePath);
 
-  public AppResponse postNewApp(WebResource resource, ResourcePath<Apps> appsResponsePath,
+  AppResponse postNewApp(WebResource resource, ResourcePath<Apps> appsResponsePath,
       AppDetailsRequest appsRequest, File file);
 
-  public AppResponse getApp(WebResource resource, ResourcePath<App> appResourcePath);
+  AppResponse getApp(WebResource resource, ResourcePath<App> appResourcePath);
 
-  public AppResponse putApp(WebResource resource, ResourcePath<App> appResourcePath, AppDetailsRequest appsRequest,
+  AppResponse putApp(WebResource resource, ResourcePath<App> appResourcePath, AppDetailsRequest appsRequest,
       File file);
 
-  public SuccessResponse deleteApp(WebResource resource, ResourcePath<App> appResourcePath);
+  SuccessResponse deleteApp(WebResource resource, ResourcePath<App> appResourcePath);
 
-  public File downloadApp(WebResource resource, ResourcePath<App> appResourcePath, Platform platform,
+  File downloadApp(WebResource resource, ResourcePath<App> appResourcePath, Platform platform,
       File targetDirectory);
+
+  AppResponse updateAppDetails(WebResource resource, ResourcePath<App> keyResourcePath,
+	      AppDetailsRequest appDetailsRequest);
 
 }

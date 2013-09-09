@@ -121,11 +121,6 @@ public class IOsKeyManagerImpl implements IOsKeyManager {
       throw new MojoFailureException("ios certificate password not defined or blank.");
     }
 
-    if (iOsMobileProvision == null || !iOsMobileProvision.exists()) {
-      String path = iOsMobileProvision == null ? null : iOsMobileProvision.getAbsolutePath();
-      throw new MojoFailureException("ios mobileprovision does not exist " + path + ".");
-    }
-
     if (iOsKey != null) {
       getLog().debug("Unlocking existing ios key.");
       IOsKeyUnlockRequest iOsKeyUnlockRequest = new IOsKeyUnlockRequest();
@@ -133,6 +128,11 @@ public class IOsKeyManagerImpl implements IOsKeyManager {
       keysManager.unlockKey(webResource, iOsKey.getResourcePath(), iOsKeyUnlockRequest);
       getLog().debug("Key unlocked.");
       return iOsKey.getResourceId();
+    }
+
+    if (iOsMobileProvision == null || !iOsMobileProvision.exists()) {
+      String path = iOsMobileProvision == null ? null : iOsMobileProvision.getAbsolutePath();
+      throw new MojoFailureException("ios mobileprovision does not exist " + path + ".");
     }
 
     getLog().debug("Building iOS key upload request.");

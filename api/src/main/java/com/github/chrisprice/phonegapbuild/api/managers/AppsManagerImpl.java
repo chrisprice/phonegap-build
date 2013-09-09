@@ -149,4 +149,17 @@ public class AppsManagerImpl implements AppsManager {
     return app.getKeys().get(platform) != null;
   }
 
+  @Override
+  public AppResponse updateAppDetails(final WebResource resource, final ResourcePath<App> keyResourcePath,
+		  final AppDetailsRequest appDetailsRequest) {
+    try {
+      final FormDataMultiPart multiPart = new FormDataMultiPart();
+      multiPart.bodyPart(new FormDataBodyPart("data", appDetailsRequest, MediaType.APPLICATION_JSON_TYPE));
+      return resource.path(keyResourcePath.getPath()).type(MediaType.MULTIPART_FORM_DATA_TYPE).put(
+              AppResponse.class, multiPart);
+    } catch (UniformInterfaceException e) {
+      throw new ApiException(e.getResponse().getEntity(ErrorResponse.class), e);
+    }
+  }
+
 }

@@ -3,6 +3,7 @@ package com.github.chrisprice.phonegapbuild.plugin;
 import java.io.File;
 import java.util.Arrays;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -282,6 +283,13 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
       appSummary = createApp(webResource, me, appSource, computedIOsKeyId, computedAndroidKeyId);
     } else {
       getLog().info("Starting upload to existing app id " + appSummary.getResourceId());
+      if (computedIOsKeyId != null || computedAndroidKeyId != null) {
+          getLog().info(String.format("Setting default iOS and Android keys - ios: %s, android: %s",
+              ObjectUtils.defaultIfNull(computedIOsKeyId, "N/A"),
+              ObjectUtils.defaultIfNull(computedAndroidKeyId, "N/A")));
+          final AppDetailsRequest appDetailsRequest = createAppDetailsRequest(computedIOsKeyId, computedAndroidKeyId);
+          appsManager.updateAppDetails(webResource, appSummary.getResourcePath(), appDetailsRequest);
+        }
       appsManager.putApp(webResource, appSummary.getResourcePath(), null, appSource);
     }
 

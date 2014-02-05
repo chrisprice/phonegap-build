@@ -166,7 +166,7 @@ public class AbstractPhoneGapBuildMojoTest extends MockObjectTestCase {
           }
 
         }));
-        oneOf(meManager).createRootWebResource("user", "pass", "http://localhost:8888");
+        oneOf(meManager).createRootWebResource("user", "pass", "http://localhost:8888", null,null);
       }
     });
     assertEquals(null, mojo.getRootWebResource());

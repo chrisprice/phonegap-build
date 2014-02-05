@@ -103,11 +103,14 @@ public abstract class AbstractPhoneGapBuildMojo extends AbstractMojo {
       ProxyInfo proxyInfo = wagonManager.getProxy("http");
       if (proxyInfo != null) {
         try {
-          URI uri = new URI("http", null, proxyInfo.getHost(), proxyInfo.getPort(), null, null, null);
-          rootWebResource = meManager.createRootWebResource(username, password, uri.toString());
-        } catch (URISyntaxException e) {
-          throw new ApiException("Could not load http proxy settings", e);
-        }
+    		  getLog().info("Using Proxy username : " + proxyInfo.getUserName() );
+    		  
+    		  URI uri = new URI("http", null, proxyInfo.getHost(), proxyInfo.getPort(), null, null, null);
+    		  
+    		  rootWebResource = meManager.createRootWebResource(username, password, uri.toString(), proxyInfo.getUserName(), proxyInfo.getPassword() );
+    	  } catch (URISyntaxException e) {
+    		  throw new ApiException("Could not load http proxy settings", e);
+    	  }
       } else {
         rootWebResource = meManager.createRootWebResource(username, password);
       }

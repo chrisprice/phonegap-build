@@ -27,6 +27,11 @@ public class MeManagerImpl implements MeManager {
 
   @Override
   public WebResource createRootWebResource(String username, String password, String proxyUri) {
+	  return createRootWebResource(username, password, proxyUri, null, null);
+  }
+
+  @Override
+  public WebResource createRootWebResource(String username, String password, String proxyUri, String proxyUser, String proxyPwd ) {
     // create a DefaultApacheHttpClientConfig (instead of just a ClientConfig)
     DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
     // configure it to use a proxy
@@ -37,6 +42,12 @@ public class MeManagerImpl implements MeManager {
     config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
     // configure to follow re-directs (used for downloading packages)
     config.getProperties().put(DefaultApacheHttpClientConfig.PROPERTY_FOLLOW_REDIRECTS, Boolean.TRUE);
+
+    // set proxy auth credentials
+  	if ( proxyUser != null && proxyPwd != null ) {
+		  config.getState().setProxyCredentials(null, null, -1, proxyUser, proxyPwd );
+    }
+
     // set http auth credentials
     config.getState().setCredentials(null, null, -1, username, password);
     // configure it to explicity use the patched MultiPartWriter

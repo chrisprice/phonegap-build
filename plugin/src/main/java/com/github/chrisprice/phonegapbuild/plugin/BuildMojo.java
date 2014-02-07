@@ -239,18 +239,33 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
    */
   private AndroidKeyManager androidKeyManager;
 
+  /**
+   * A ready-to-upload zip file in case you want to control package content.
+   * Thus, you can filter some resources like the config.xml before uploading to PhoneGap.
+   * 
+   * @parameter
+   */
+  private File preparedPackage;
+
   public void execute() throws MojoExecutionException, MojoFailureException {
     ensureWorkingDirectory();
 
-    getLog().debug("Creating zip for upload to cloud.");
-
-    appUploadPackager.setConfigFile(configFile);
-    appUploadPackager.setWarDirectory(warDirectory);
-    appUploadPackager.setWarExcludes(warExcludes);
-    appUploadPackager.setWarIncludes(warIncludes);
-    appUploadPackager.setWorkingDirectory(workingDirectory);
-    appUploadPackager.setZipFile(zipFile);
-    File appSource = appUploadPackager.createUploadPackage();
+    File appSource = preparedPackage;
+    
+    if ( null == preparedPackage ) {
+        getLog().debug("Creating zip for upload to cloud.");
+        
+        appUploadPackager.setConfigFile(configFile);
+        appUploadPackager.setWarDirectory(warDirectory);
+        appUploadPackager.setWarExcludes(warExcludes);
+        appUploadPackager.setWarIncludes(warIncludes);
+        appUploadPackager.setWorkingDirectory(workingDirectory);
+        appUploadPackager.setZipFile(zipFile);
+        
+        appSource = appUploadPackager.createUploadPackage();
+    } else {
+        getLog().debug("Using prepared zip for upload to cloud.");
+    }
 
     getLog().debug("Authenticating.");
     WebResource webResource = getRootWebResource();

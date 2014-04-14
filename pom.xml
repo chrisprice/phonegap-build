@@ -41,7 +41,7 @@
 	</developers>
 
 	<properties>
-		<currentStableVersion>0.0.4</currentStableVersion>
+		<currentStableVersion>0.0.7</currentStableVersion>
 	</properties>
 
 	<modules>

@@ -18,6 +18,8 @@
 'PhoneGap Build API 0.0.8-SNAPSHOT API'
 -link
 'http://java.sun.com/javase/6/docs/api'
+-linkoffline
+'https://github.com/chrisprice/phonegap-build/phonegap-build-maven-plugin/apidocs' '/home/cprice/phonegap-build/plugin/target/site/apidocs'
 -use
 -version
 -windowtitle

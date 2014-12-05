@@ -1,10 +1,13 @@
 package com.github.chrisprice.phonegapbuild.api.data.apps;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import com.github.chrisprice.phonegapbuild.api.data.HasAllPlatforms;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.resources.AppDownload;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AppDownloadResponse implements HasAllPlatforms<ResourcePath<AppDownload>> {
 
   private String android;

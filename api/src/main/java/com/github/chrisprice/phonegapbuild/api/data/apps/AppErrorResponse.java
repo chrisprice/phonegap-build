@@ -1,8 +1,11 @@
 package com.github.chrisprice.phonegapbuild.api.data.apps;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import com.github.chrisprice.phonegapbuild.api.data.HasAllPlatforms;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AppErrorResponse implements HasAllPlatforms<String> {
   private String android;
   private String blackberry;

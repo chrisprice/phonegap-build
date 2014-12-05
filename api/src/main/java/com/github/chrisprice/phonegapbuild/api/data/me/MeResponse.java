@@ -1,13 +1,14 @@
 package com.github.chrisprice.phonegapbuild.api.data.me;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import com.github.chrisprice.phonegapbuild.api.data.HasResourceIdAndPath;
 import com.github.chrisprice.phonegapbuild.api.data.ResourceId;
 import com.github.chrisprice.phonegapbuild.api.data.ResourcePath;
 import com.github.chrisprice.phonegapbuild.api.data.resources.Me;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MeResponse implements HasResourceIdAndPath<Me> {
 
   private String username;

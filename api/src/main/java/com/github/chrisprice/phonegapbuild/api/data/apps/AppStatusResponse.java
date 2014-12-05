@@ -1,9 +1,12 @@
 package com.github.chrisprice.phonegapbuild.api.data.apps;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import com.github.chrisprice.phonegapbuild.api.data.HasAllPlatforms;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 import com.github.chrisprice.phonegapbuild.api.data.Status;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AppStatusResponse implements HasAllPlatforms<Status> {
   private Status android;
   private Status blackberry;

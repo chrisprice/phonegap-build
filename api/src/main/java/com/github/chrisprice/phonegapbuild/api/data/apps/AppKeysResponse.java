@@ -1,8 +1,11 @@
 package com.github.chrisprice.phonegapbuild.api.data.apps;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import com.github.chrisprice.phonegapbuild.api.data.HasAllPlatforms;
 import com.github.chrisprice.phonegapbuild.api.data.Platform;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AppKeysResponse implements HasAllPlatforms<AppPlatformKeyResponse> {
 
   private AppPlatformKeyResponse android;

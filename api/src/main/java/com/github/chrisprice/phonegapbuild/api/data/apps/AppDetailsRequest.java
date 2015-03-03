@@ -35,6 +35,7 @@ public class AppDetailsRequest {
   @JsonProperty("create_method")
   private String createMethod;
   private Keys keys;
+  private Boolean debug;
 
   public String getTitle() {
     return title;
@@ -74,6 +75,14 @@ public class AppDetailsRequest {
 
   public void setKeys(Keys keys) {
     this.keys = keys;
+  }
+
+  public Boolean getDebug() {
+    return debug;
+  }
+
+  public void setDebug(Boolean debug) {
+    this.debug = debug;
   }
 
 }

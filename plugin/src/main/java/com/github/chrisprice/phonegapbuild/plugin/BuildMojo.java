@@ -215,6 +215,13 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
       "android", "blackberry", "ios", "symbian", "webos", "winphone"};
 
   /**
+   * Enables debugging.
+   *
+   * @parameter default-value="false"
+   */
+   private boolean debug;
+
+  /**
    * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore"
    */
   private ResourceIdStore<App> appIdStore;
@@ -391,6 +398,7 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
       keys.setAndroid(androidKeyId.getId());
     }
     appDetailsRequest.setKeys(keys);
+    appDetailsRequest.setDebug(debug);
     return appDetailsRequest;
   }
 

@@ -3,6 +3,7 @@ package com.github.chrisprice.phonegapbuild.plugin;
 import java.io.File;
 import java.util.Arrays;
 
+import com.github.chrisprice.phonegapbuild.api.managers.KeysManager;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -219,12 +220,24 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
    *
    * @parameter default-value="false"
    */
+   private boolean deleteAppInPhoneGapBuildAfterBuild;
+
+  /**
+   * Enables debugging.
+   *
+   * @parameter default-value="false"
+   */
    private boolean debug;
 
   /**
    * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore"
    */
   private ResourceIdStore<App> appIdStore;
+
+ /**
+  * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.ResourceIdStore"
+  */
+  private ResourceIdStore<Key> keyIdStore;
 
   /**
    * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.AppUploadPackager"
@@ -245,6 +258,14 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
    * @component role="com.github.chrisprice.phonegapbuild.plugin.utils.AndroidKeyManager"
    */
   private AndroidKeyManager androidKeyManager;
+
+
+  /**
+   * @component role="com.github.chrisprice.phonegapbuild.api.managers.KeysManager"
+   * @required
+   * @readonly
+   */
+  protected KeysManager keysManager;
 
   /**
    * A ready-to-upload zip file in case you want to control package content.
@@ -319,6 +340,31 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
     appDownloader.setProject(project);
     appDownloader.setWorkingDirectory(workingDirectory);
     appDownloader.downloadArtifacts(webResource, appSummary.getResourcePath(), Platform.get(platforms));
+
+    if (deleteAppInPhoneGapBuildAfterBuild) {
+      getLog().info("Deleting cloud app id " + appSummary.getResourceId());
+      appsManager.deleteApp(webResource, appSummary.getResourcePath());
+
+      me = meManager.requestMe(webResource);
+
+      keyIdStore.setAlias("ios-key");
+      keyIdStore.setWorkingDirectory(workingDirectory);
+      HasResourceIdAndPath<Key> iOsKey = keyIdStore.load(me.getKeys().getIos().getAll());
+
+      if (iOsKey != null) {
+        getLog().info("Deleting cloud ios key id " + iOsKey.getResourceId());
+        keysManager.deleteKey(webResource, iOsKey.getResourcePath());
+      }
+
+      keyIdStore.setAlias("android-key");
+      keyIdStore.setWorkingDirectory(workingDirectory);
+      HasResourceIdAndPath<Key> androidKey = keyIdStore.load(me.getKeys().getAndroid().getAll());
+
+      if (androidKey != null) {
+        getLog().info("Deleting cloud android key id " + androidKey.getResourceId());
+        keysManager.deleteKey(webResource, androidKey.getResourcePath());
+      }
+    }
   }
 
   private HasResourceIdAndPath<App> createApp(WebResource webResource, MeResponse me, File appSource,
@@ -461,5 +507,4 @@ public class BuildMojo extends AbstractPhoneGapBuildMojo {
   public void setiOsKeyManager(IOsKeyManager iOsKeyManager) {
     this.iOsKeyManager = iOsKeyManager;
   }
-
 }

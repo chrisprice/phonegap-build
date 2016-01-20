@@ -1,3 +1,5 @@
+## I am no longer actively maintained this project, as I have personally not used it for a number of years. If anyone wishes to adopt it, I'm happy to help them take over.
+
 # PhoneGap Build Java API and Maven Plugin
 
 This project aims to provide a stand-alone Java API for communicating with the PhoneGap Build REST API and a Maven Plugin which makes use of the API to turn WAR projects into binaries for mobile platforms.
